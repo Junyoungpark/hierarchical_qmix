@@ -17,13 +17,16 @@ class RelationalGraphLayer(nn.Module):
                  node_types: list,
                  edge_types: list,
                  updater_conf: dict,
-                 use_residual: bool = False,
-                 use_concat: bool = False):
+                 use_residual: bool,
+                 use_concat: bool):
         """
-        :param input_node_dim:
-        :param output_node_dim:
-        :param node_types:
-        :param edge_types:
+        :param input_node_dim: input node dim (exclude concat dim)
+        :param output_node_dim: output node dim
+        :param node_types: list of integer node types
+        :param edge_types: list of integer edge types
+        :param updater_conf:
+        :param use_residual:
+        :param use_concat:
         """
 
         super(RelationalGraphLayer, self).__init__()
@@ -113,16 +116,15 @@ class RelationalGraphLayer(nn.Module):
 
         node_enc_input = torch.zeros(node_feature.shape[0], self.node_updater_input_dim, device=device)
         if self.use_concat:
-            node_enc_input[:, :self.model_dim * 2] = F.relu(node_feature)
+            node_enc_input[:, :self.input_dim * 2] = F.relu(node_feature)
             start_index = 2
         else:
-            node_enc_input[:, :self.model_dim] = F.relu(node_feature)
+            node_enc_input[:, :self.input_dim] = F.relu(node_feature)
             start_index = 1
 
         for i in update_edge_type_indices:
             msg = nodes.mailbox['msg_{}'.format(i)]
             reduced_msg = msg.sum(dim=1)
-            node_enc_input[:, self.model_dim * (i + start_index):self.model_dim * (i + start_index + 1)] = reduced_msg
+            node_enc_input[:, self.input_dim * (i + start_index):self.input_dim * (i + start_index + 1)] = reduced_msg
 
         return {'aggregated_node_feature': node_enc_input}
-
