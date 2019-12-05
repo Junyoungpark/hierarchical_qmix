@@ -1,9 +1,12 @@
 import warnings
+from functools import partial
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from src.nn.MLP import MultiLayerPerceptron as MLP
+from src.utils.graph_utils import get_filtered_node_index_by_type
 
 
 class RelationalGraphLayer(nn.Module):
@@ -89,6 +92,25 @@ class RelationalGraphLayer(nn.Module):
         else:
             graph.ndata['node_feature'] = node_feature
 
+        graph.send_and_recv(graph.edges(),
+                            message_func=self.message_function(),
+                            reduce_func=self.reduce_function())
+
+        for ntype_idx in self.node_types:
+            node_indices = get_filtered_node_index_by_type(graph, ntype_idx)
+            node_updater = self.node_updater[ntype_idx]
+            apply_node_func = partial(self.apply_node_function_multi_type, updater=node_updater)
+            graph.apply_nodes(apply_node_func, v=node_indices)
+
+        updated_node_feature = graph.ndata.pop('updated_node_feature')
+        _ = graph.ndata.pop('aggregated_node_feature')
+        _ = graph.ndata.pop('node_feature')
+
+        if self.use_residual:
+            updated_node_feature = updated_node_feature + node_feature
+
+        return updated_node_feature
+
     def message_function(self, edges):
         src_node_features = edges.src['node_feature']
         edge_types = edges.data['edge_type']
@@ -110,7 +132,7 @@ class RelationalGraphLayer(nn.Module):
                 msg_dict['msg_{}'.format(i)] = msg
         return msg_dict
 
-    def reduce_function(self, nodes, update_edge_type_indices):
+    def reduce_function(self, nodes):
         node_feature = nodes.data['node_feature']
         device = node_feature.device
 
@@ -122,9 +144,14 @@ class RelationalGraphLayer(nn.Module):
             node_enc_input[:, :self.input_dim] = F.relu(node_feature)
             start_index = 1
 
-        for i in update_edge_type_indices:
+        for i in self.edge_types:
             msg = nodes.mailbox['msg_{}'.format(i)]
             reduced_msg = msg.sum(dim=1)
             node_enc_input[:, self.input_dim * (i + start_index):self.input_dim * (i + start_index + 1)] = reduced_msg
 
         return {'aggregated_node_feature': node_enc_input}
+
+    def apply_node_function_multi_type(self, nodes, updater):
+        aggregated_node_feature = nodes.data['aggregated_node_feature']
+        out = updater(aggregated_node_feature)
+        return {'updated_node_feature': out}
