@@ -3,6 +3,7 @@ import warnings
 
 from src.config.ConfigBase import ConfigBase
 from src.brain.Brainbase import BrainBase
+from src.util.train_util import dn
 
 
 class QmixBrainConfig(ConfigBase):
@@ -102,10 +103,6 @@ class QmixBrain(BrainBase):
         target_q_tot = target_mixer(inputs['curr_graph'], inputs['curr_feature'], target_q)
         return target_q_tot
 
-    # @staticmethod
-    # def _computes_clipped_qs(inputs: dict, qnet, mixer, qnet2, mixer2):
-    #     pass
-
     def fit(self, curr_inputs, next_inputs, actions, rewards, dones):
 
         q_tot = self._compute_qs(qnet=self.qnet,
@@ -157,7 +154,7 @@ class QmixBrain(BrainBase):
                                clip_val=norm_clip_val)
 
         fit_dict = dict()
-        fit_dict['loss'] = loss.detach().cpu().numpy()
+        fit_dict['loss'] = dn(loss)
 
         if self.use_clipped_q:
             loss2 = torch.nn.functional.mse_loss(input=q_tot2, target=q_targets)
@@ -167,7 +164,7 @@ class QmixBrain(BrainBase):
                                    loss=loss2,
                                    clip_val=norm_clip_val)
 
-            fit_dict['loss2'] = loss2.detach().cpu().numpy()
+            fit_dict['loss2'] = dn(loss2)
 
         else:
             self.update_target_network(self.fit_conf['tau'], self.qnet, self.qnet2)
