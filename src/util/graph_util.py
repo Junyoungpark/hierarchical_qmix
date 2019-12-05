@@ -89,6 +89,14 @@ def get_largest_number_of_enemy_nodes(graphs):
     return max_num_enemy
 
 
+def get_number_of_ally_nodes(graphs):
+    nums_ally = []
+    for graph in graphs:
+        num_ally = len(get_filtered_node_index_by_type(graph, NODE_ALLY))
+        nums_ally.append(num_ally)
+    return nums_ally
+
+
 # ************************ WARNING ****************************
 # DO NOT ERASE UNUSED ARGUMENT 'id_range' OF curie_initializer
 # ************************ WARNING ****************************

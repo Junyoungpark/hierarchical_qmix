@@ -3,12 +3,10 @@ import math
 import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
+from src.nn.activations import get_nn_activation
 
 
 class GraphConvolutionLayer(nn.Module):
-    """
-    Simple GCN layer, bring from https://github.com/tkipf/pygcn/blob/master/pygcn/layers.py
-    """
 
     def __init__(self, in_features, out_features, bias=True):
         super(GraphConvolutionLayer, self).__init__()
@@ -19,6 +17,7 @@ class GraphConvolutionLayer(nn.Module):
             self.bias = Parameter(torch.FloatTensor(out_features))
         else:
             self.register_parameter('bias', None)
+
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -47,10 +46,12 @@ class GraphConvolutionLayer(nn.Module):
 
         support = input.matmul(self.weight)  # [# graphs x # nodes per graph x # out_feat_dim]
         output = support.bmm(adj)
+
         if self.bias is not None:
-            return output + self.bias
-        else:
-            return output
+            output = output + self.bias
+
+        return output
+
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' \
@@ -60,12 +61,14 @@ class GraphConvolutionLayer(nn.Module):
 
 if __name__ == "__main__":
     batch_size = 5
-    num_nodes = 10
+    num_nodes = 3
     in_feats = 2
-    out_feats = 3
+    out_feats = 1
 
     gc = GraphConvolutionLayer(in_feats, out_feats)
 
     adj = torch.rand(size=(batch_size, out_feats, out_feats))
     input = torch.rand(size=(batch_size, num_nodes, in_feats))
     output = gc(input, adj)
+
+    print(output)
