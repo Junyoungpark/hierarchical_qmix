@@ -24,9 +24,7 @@ class QMixerConfig(ConfigBase):
             'num_clusters': 3,
         }
 
-        self.b_net = {'prefix': 'mixer-b-net',
-                      **MLPConfig().mlp,
-                      'input_dimension': 16}
+        self.b_net = {'prefix': 'mixer-b-net', **MLPConfig().mlp}
         self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
 
 
@@ -38,10 +36,10 @@ class QMixer(nn.Module):
         self.conf = conf
         self.num_clusters = conf.mixer['num_clusters']
 
-        b_net_conf = conf.b_net()
+        b_net_conf = conf.b_net
         b_net_conf['output_dimension'] = self.num_clusters
 
-        w_net_conf = conf.w_net()
+        w_net_conf = conf.w_net
         w_net_conf['output_node_dim'] = self.num_clusters
 
         self.q_b_net = MLP(**b_net_conf)

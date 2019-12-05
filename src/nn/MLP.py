@@ -12,7 +12,7 @@ class MLPConfig(ConfigBase):
             'prefix': 'mlp',
             'input_dimension': 32,
             'output_dimension': 32,
-            'activation': 'Mish',
+            'activation': 'mish',
             'out_activation': None,
             'num_neurons': [64, 64],
             'normalization': None,
