@@ -3,29 +3,34 @@ import torch
 
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
 from src.nn.GraphConvolution import GraphConvolutionLayer
-from src.rl.Qmixer import QMixer, QMixerConfig
+from src.rl.Qmixer import Qmixer, QmixerConfig
 from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 
 
 class QmixNetworkConfig(ConfigBase):
-    def __init__(self, submixer_conf=None, supmixer_conf=None):
-        super(QmixNetworkConfig, self).__init__(submixer=submixer_conf, supmixer=supmixer_conf)
-        self.submixer = QMixerConfig()
-        self.supmixer = {'prefix': 'supmixer'}.update(MLPConfig().mlp)
+    def __init__(self, submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None):
+        super(QmixNetworkConfig, self).__init__(submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
+                                                supmixer_mlp=supmixer_mlp_conf)
+        self.submixer = QmixerConfig()
+        self.supmixer_mlp = {'prefix': 'supmixer_mlp', **MLPConfig().mlp}
+        self.supmixer_gc = {'prefix': 'supmixer_gc',
+                            'in_features': 3,
+                            'out_features': 1,
+                            'bias': True}
 
 
 class QmixNetwork(torch.nn.Module):
     def __init__(self, conf):
         super(QmixNetwork, self).__init__()
 
-        self.submixer_conf = conf.submixer()
-        self.supmixer_gc_conf = conf.supmixer_gc()
-        self.supmixer_mlp_conf = conf.supmixer_mlp()
+        self.submixer_conf = conf.submixer
+        self.supmixer_gc_conf = conf.supmixer_gc
+        self.supmixer_mlp_conf = conf.supmixer_mlp
 
-        self.submixer = QMixer(self.submixer_conf)
-        self.supmixer = GraphConvolutionLayer(self.supmixer_gc_conf)
-        self.supmixer_b = MLP(self.supmixer_mlp_conf)
+        self.submixer = Qmixer(self.submixer_conf)
+        self.supmixer = GraphConvolutionLayer(**self.supmixer_gc_conf)
+        self.supmixer_b = MLP(**self.supmixer_mlp_conf)
 
     def forward(self, graph, node_feature, qs):
         sub_q_ret_dict = self.submixer(graph, node_feature, qs)
@@ -60,6 +65,7 @@ class QmixNetwork(torch.nn.Module):
 
         return sup_qs
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     conf = QmixNetworkConfig()
     QmixNetwork(conf)

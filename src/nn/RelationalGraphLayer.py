@@ -75,7 +75,7 @@ class RelationalGraphLayer(nn.Module):
         self.node_updaters = nn.ModuleDict()
         for ntype_idx in node_types:
             node_updater = MLP(**updater_conf)
-            self.node_updaters[ntype_idx] = node_updater
+            self.node_updaters['updater{}'.format(ntype_idx)] = node_updater
 
         # initialize edge updaters
         updater_conf['input_dimension'] = edge_updater_input_dim
@@ -84,7 +84,7 @@ class RelationalGraphLayer(nn.Module):
         self.edge_updaters = nn.ModuleDict()
         for etype_idx in edge_types:
             edge_updater = MLP(**updater_conf)
-            self.edge_updaters[etype_idx] = edge_updater
+            self.edge_updaters['updater{}'.format(etype_idx)] = edge_updater
 
     def forward(self, graph, node_feature):
         if self.use_concat:
@@ -98,7 +98,7 @@ class RelationalGraphLayer(nn.Module):
 
         for ntype_idx in self.node_types:
             node_indices = get_filtered_node_index_by_type(graph, ntype_idx)
-            node_updater = self.node_updater[ntype_idx]
+            node_updater = self.node_updater['updater{}'.format(ntype_idx)]
             apply_node_func = partial(self.apply_node_function_multi_type, updater=node_updater)
             graph.apply_nodes(apply_node_func, v=node_indices)
 
@@ -120,7 +120,7 @@ class RelationalGraphLayer(nn.Module):
         msg_dict = dict()
         for i in self.edge_types:
             msg = torch.zeros(src_node_features.shape[0], self.edge_updater_input_dim, device=device)
-            updater = self.edge_updaters[i]
+            updater = self.edge_updaters['updater{}'.format(i)]
 
             curr_relation_mask = edge_types == i
             curr_relation_pos = torch.arange(src_node_features.shape[0])[curr_relation_mask]

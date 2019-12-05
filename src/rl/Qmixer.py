@@ -12,10 +12,10 @@ from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_filtered_node_index_by_type
 
 
-class QMixerConfig(ConfigBase):
+class QmixerConfig(ConfigBase):
 
     def __init__(self, mixer_conf=None, b_net_conf=None, w_net_conf=None):
-        super(QMixerConfig, self).__init__(mixer=mixer_conf,
+        super(QmixerConfig, self).__init__(mixer=mixer_conf,
                                            b_net=b_net_conf,
                                            w_net=w_net_conf)
 
@@ -24,25 +24,22 @@ class QMixerConfig(ConfigBase):
             'num_clusters': 3,
         }
 
-        self.b_net = {'prefix': 'mixer-b-net',
-                      **MLPConfig().mlp,
-                      'input_dimension': 16}
-        self.w_net = {'prefix': 'mixer-w-net',
-                      **RGNConfig().gnn}
+        self.b_net = {'prefix': 'mixer-b-net', **MLPConfig().mlp}
+        self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
 
 
-class QMixer(nn.Module):
+class Qmixer(nn.Module):
 
     def __init__(self, conf):
-        super(QMixer, self).__init__()
+        super(Qmixer, self).__init__()
 
         self.conf = conf
         self.num_clusters = conf.mixer['num_clusters']
 
-        b_net_conf = conf.b_net()
+        b_net_conf = conf.b_net
         b_net_conf['output_dimension'] = self.num_clusters
 
-        w_net_conf = conf.w_net()
+        w_net_conf = conf.w_net
         w_net_conf['output_node_dim'] = self.num_clusters
 
         self.q_b_net = MLP(**b_net_conf)

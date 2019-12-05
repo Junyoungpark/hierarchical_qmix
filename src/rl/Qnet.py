@@ -11,9 +11,9 @@ from src.nn.MLP import MLPConfig
 class QnetConfig(ConfigBase):
 
     def __init__(self,
-                 qnet_conf,
-                 move_module_conf,
-                 attack_module_conf):
+                 qnet_conf=None,
+                 move_module_conf=None,
+                 attack_module_conf=None):
         super(QnetConfig, self).__init__(qnet=qnet_conf,
                                          move_module=move_module_conf,
                                          attack_module=attack_module_conf)
@@ -26,8 +26,8 @@ class QnetConfig(ConfigBase):
             'ally_node_type_index': NODE_ALLY
         }
 
-        self.move_module = {'prefix': 'qnet-move'}.update(mlp_conf)
-        self.attack_module = {'prefix': 'qnet-attack'}.update(mlp_conf)
+        self.move_module = {'prefix': 'qnet-move', **mlp_conf}
+        self.attack_module = {'prefix': 'qnet-attack', **mlp_conf}
 
 
 class Qnet(nn.Module):
