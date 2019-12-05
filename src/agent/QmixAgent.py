@@ -31,4 +31,4 @@ class QmixAgent(torch.nn.Module):
 
         self.brain = QmixBrain
 
-    def get_action(self, inputs):
+    # def get_action(self, inputs):
