@@ -24,9 +24,10 @@ class QMixerConfig(ConfigBase):
             'num_clusters': 3,
         }
 
-        self.b_net = {'prefix': 'mixer-b-net'}
-        self.b_net.update(MLPConfig().mlp)
-        self.w_net = {'prefix': 'mixer-w-net'}.update(RGNConfig().gnn)
+        self.b_net = {'prefix': 'mixer-b-net',
+                      **MLPConfig().mlp,
+                      'input_dimension': 16}
+        self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
 
 
 class QMixer(nn.Module):
