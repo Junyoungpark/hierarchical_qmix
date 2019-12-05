@@ -14,7 +14,7 @@ from src.util.graph_util import get_filtered_node_index_by_type
 
 class QMixerConfig(ConfigBase):
 
-    def __init__(self, mixer_conf, b_net_conf, w_net_conf):
+    def __init__(self, mixer_conf=None, b_net_conf=None, w_net_conf=None):
         super(QMixerConfig, self).__init__(mixer=mixer_conf,
                                            b_net=b_net_conf,
                                            w_net=w_net_conf)
