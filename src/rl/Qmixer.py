@@ -27,7 +27,8 @@ class QMixerConfig(ConfigBase):
         self.b_net = {'prefix': 'mixer-b-net',
                       **MLPConfig().mlp,
                       'input_dimension': 16}
-        self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
+        self.w_net = {'prefix': 'mixer-w-net',
+                      **RGNConfig().gnn}
 
 
 class QMixer(nn.Module):
