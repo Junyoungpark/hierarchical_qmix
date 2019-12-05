@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.nn.MLP import MultiLayerPerceptron as MLP
-from src.utils.graph_utils import get_filtered_node_index_by_type
+from src.util.graph_util import get_filtered_node_index_by_type
 
 
 class RelationalGraphLayer(nn.Module):
