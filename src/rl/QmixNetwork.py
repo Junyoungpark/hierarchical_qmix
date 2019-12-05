@@ -50,4 +50,12 @@ class QmixNetwork(torch.nn.Module):
         sup_weighted_qs = sup_ws * aggregated_q.unsqueeze(dim=-1)  # [#. graph x #.cluster x 1]
         sup_qs = sup_weighted_qs.sum(dim=1)
 
+        if isinstance(graph, dgl.BatchedDGLGraph):
+            num_graphs = graph.batch_size
+        else:
+            num_graphs = 1
+
+        sup_q_bs = self.supmixer_b((aggregated_feat.view(num_graphs, -1)))  # [#. graph x  1]
+        sup_qs = sup_qs + sup_q_bs
+
         return sup_qs
