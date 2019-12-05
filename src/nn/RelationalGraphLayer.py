@@ -93,8 +93,8 @@ class RelationalGraphLayer(nn.Module):
             graph.ndata['node_feature'] = node_feature
 
         graph.send_and_recv(graph.edges(),
-                            message_func=self.message_function(),
-                            reduce_func=self.reduce_function())
+                            message_func=self.message_function,
+                            reduce_func=self.reduce_function)
 
         for ntype_idx in self.node_types:
             node_indices = get_filtered_node_index_by_type(graph, ntype_idx)
