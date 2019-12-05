@@ -12,10 +12,10 @@ from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_filtered_node_index_by_type
 
 
-class QMixerConfig(ConfigBase):
+class QmixerConfig(ConfigBase):
 
     def __init__(self, mixer_conf=None, b_net_conf=None, w_net_conf=None):
-        super(QMixerConfig, self).__init__(mixer=mixer_conf,
+        super(QmixerConfig, self).__init__(mixer=mixer_conf,
                                            b_net=b_net_conf,
                                            w_net=w_net_conf)
 
@@ -28,10 +28,10 @@ class QMixerConfig(ConfigBase):
         self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
 
 
-class QMixer(nn.Module):
+class Qmixer(nn.Module):
 
     def __init__(self, conf):
-        super(QMixer, self).__init__()
+        super(Qmixer, self).__init__()
 
         self.conf = conf
         self.num_clusters = conf.mixer['num_clusters']

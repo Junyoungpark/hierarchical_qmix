@@ -3,7 +3,7 @@ import torch
 
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
 from src.nn.GraphConvolution import GraphConvolutionLayer
-from src.rl.Qmixer import QMixer, QMixerConfig
+from src.rl.Qmixer import Qmixer, QmixerConfig
 from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 
@@ -12,7 +12,7 @@ class QmixNetworkConfig(ConfigBase):
     def __init__(self, submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None):
         super(QmixNetworkConfig, self).__init__(submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
                                                 supmixer_mlp=supmixer_mlp_conf)
-        self.submixer = QMixerConfig()
+        self.submixer = QmixerConfig()
         self.supmixer_mlp = {'prefix': 'supmixer_mlp', **MLPConfig().mlp}
         self.supmixer_gc = {'prefix': 'supmixer_gc',
                             'in_features': 3,
@@ -28,7 +28,7 @@ class QmixNetwork(torch.nn.Module):
         self.supmixer_gc_conf = conf.supmixer_gc
         self.supmixer_mlp_conf = conf.supmixer_mlp
 
-        self.submixer = QMixer(self.submixer_conf)
+        self.submixer = Qmixer(self.submixer_conf)
         self.supmixer = GraphConvolutionLayer(**self.supmixer_gc_conf)
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
 
