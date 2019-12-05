@@ -6,9 +6,9 @@ from src.config.ConfigBase import ConfigBase
 class MLPConfig(ConfigBase):
 
     def __init__(self, mlp_conf=None):
-        super(MLPConfig, self).__init__(mlp_conf=mlp_conf)
+        super(MLPConfig, self).__init__(mlp=mlp_conf)
 
-        self.mlp_conf = {
+        self.mlp = {
             'prefix': 'mlp',
             'input_dimension': 32,
             'output_dimension': 32,
