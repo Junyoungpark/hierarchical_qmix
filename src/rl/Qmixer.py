@@ -24,7 +24,8 @@ class QMixerConfig(ConfigBase):
             'num_clusters': 3,
         }
 
-        self.b_net = {'prefix': 'mixer-b-net'}.update(MLPConfig().mlp)
+        self.b_net = {'prefix': 'mixer-b-net'}
+        self.b_net.update(MLPConfig().mlp)
         self.w_net = {'prefix': 'mixer-w-net'}.update(RGNConfig().gnn)
 
 
@@ -112,3 +113,8 @@ class QMixer(nn.Module):
         ret_dict['ws'] = ws
         ret_dict['feat'] = aggregated_feat
         return ret_dict
+
+
+if __name__ == "__main__":
+    conf = QMixerConfig()
+    QMixer(conf)

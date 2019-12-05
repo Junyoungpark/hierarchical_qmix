@@ -59,3 +59,7 @@ class QmixNetwork(torch.nn.Module):
         sup_qs = sup_qs + sup_q_bs
 
         return sup_qs
+
+if __name__ =="__main__":
+    conf = QmixNetworkConfig()
+    QmixNetwork(conf)
