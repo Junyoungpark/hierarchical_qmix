@@ -1,18 +1,32 @@
 import torch
 
-from src.rl.Qnet import Qnet, QnetConfig
+from src.rl.Qnet import Qnet, QnetConfig, rQnetConfig
 from src.rl.QmixNetwork import QmixNetwork, QmixerConfig
 from src.brain.QmixBrain import QmixBrain, QmixBrainConfig
 
+from src.config.ConfigBase_refac import ConfigBase as rConfigBase
 from src.config.ConfigBase import ConfigBase
 
 
 class QmixAgentConf(ConfigBase):
     def __init__(self, qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None, buffer_conf=None):
-        super(QmixAgentConf, self).__init__(qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf, fit=fit_conf, buffer=buffer_conf)
+        super(QmixAgentConf, self).__init__(qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf, fit=fit_conf,
+                                            buffer=buffer_conf)
         self.qnet = QnetConfig()
         self.mixer = QmixerConfig()
         self.brain = QmixBrainConfig()
+
+
+class rQmixAgentConf(rConfigBase):
+    def __init__(self, name='qagent', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
+                 buffer_conf=None):
+        super(rQmixAgentConf, self).__init__(name=name,
+                                             qnet=qnet_conf,
+                                             mixer=mixer_conf,
+                                             brain=brain_conf,
+                                             fit=fit_conf,
+                                             buffer=buffer_conf)
+        self.qnet = rQnetConfig()
 
 
 class QmixAgent(torch.nn.Module):
@@ -32,3 +46,13 @@ class QmixAgent(torch.nn.Module):
         self.brain = QmixBrain
 
     # def get_action(self, inputs):
+
+
+if __name__ == '__main__':
+    conf = QmixAgentConf()
+    #conf()
+
+    rconf = rQmixAgentConf()
+    rconf()
+    print(conf())
+    print(rconf())

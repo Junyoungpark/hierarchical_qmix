@@ -21,6 +21,24 @@ class MLPConfig(ConfigBase):
             'use_noisy': False}
 
 
+class rMLPConfig(ConfigBase):
+
+    def __init__(self, name='mlp', mlp_conf=None):
+        super(rMLPConfig, self).__init__(name=name, mlp=mlp_conf)
+
+        self.mlp = {
+            'prefix': 'mlp',
+            'input_dimension': 32,
+            'output_dimension': 32,
+            'activation': 'mish',
+            'out_activation': None,
+            'num_neurons': [64, 64],
+            'normalization': None,
+            'weight_init': 'xavier',
+            'dropout_probability': 0.0,
+            'use_noisy': False}
+
+
 class MultiLayerPerceptron(nn.Module):
 
     def __init__(self,

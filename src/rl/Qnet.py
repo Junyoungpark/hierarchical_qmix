@@ -4,8 +4,9 @@ import torch.nn as nn
 from src.rl.ActionModules import MoveModule, AttackModule
 from src.util.graph_util import get_filtered_node_index_by_type
 from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase as rConfigBase
 from src.config.graph_config import NODE_ALLY, EDGE_ENEMY
-from src.nn.MLP import MLPConfig
+from src.nn.MLP import MLPConfig, rMLPConfig
 
 
 class QnetConfig(ConfigBase):
@@ -19,6 +20,30 @@ class QnetConfig(ConfigBase):
                                          attack_module=attack_module_conf)
 
         mlp_conf = MLPConfig().mlp
+
+        self.qnet = {
+            'prefix': 'qnet',
+            'attack_edge_type_index': EDGE_ENEMY,
+            'ally_node_type_index': NODE_ALLY
+        }
+
+        self.move_module = {'prefix': 'qnet-move', **mlp_conf}
+        self.attack_module = {'prefix': 'qnet-attack', **mlp_conf}
+
+
+class rQnetConfig(rConfigBase):
+
+    def __init__(self,
+                 name='qnet',
+                 qnet_conf=None,
+                 move_module_conf=None,
+                 attack_module_conf=None):
+        super(rQnetConfig, self).__init__(name=name,
+                                          qnet=qnet_conf,
+                                          move_module=move_module_conf,
+                                          attack_module=attack_module_conf)
+
+        mlp_conf = rMLPConfig().mlp
 
         self.qnet = {
             'prefix': 'qnet',
