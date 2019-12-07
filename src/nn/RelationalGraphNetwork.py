@@ -2,15 +2,15 @@ import torch.nn as nn
 from src.nn.RelationalGraphLayer import RelationalGraphLayer
 from src.nn.MLP import MLPConfig
 
-from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase
 from src.config.graph_config import (NODE_ALLY, NODE_ENEMY,
                                      EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY)
 
 
 class RelationalGraphNetworkConfig(ConfigBase):
 
-    def __init__(self, gnn_conf=None):
-        super(RelationalGraphNetworkConfig, self).__init__(gnn=gnn_conf)
+    def __init__(self, name='gnn_', gnn_conf=None):
+        super(RelationalGraphNetworkConfig, self).__init__(name=name)
 
         self.gnn = {
             'prefix': 'gnn',
@@ -23,7 +23,7 @@ class RelationalGraphNetworkConfig(ConfigBase):
             'updater_conf': MLPConfig().mlp,
             'use_residual': True,
             'use_concat': False,
-        }
+        } if gnn_conf is None else gnn_conf
 
 
 class RelationalGraphNetwork(nn.Module):

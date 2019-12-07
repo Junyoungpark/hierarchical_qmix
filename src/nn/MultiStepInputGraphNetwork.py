@@ -3,33 +3,31 @@ import torch
 
 from src.nn.RelationalGraphNetwork import RelationalGraphNetwork, RelationalGraphNetworkConfig
 from src.nn.RNNEncoder import RNNEncoder
-from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase
 
 
 class MultiStepInputGraphNetworkConfig(ConfigBase):
 
     def __init__(self,
+                 name='multistepgnn',
                  hist_rnn_conf=None,
                  hist_enc_conf=None,
-                 curr_enc_conf=None):
-        super(MultiStepInputGraphNetworkConfig, self).__init__(hist_rnn_conf=hist_rnn_conf,
-                                                               hist_enc_conf=hist_enc_conf,
-                                                               curr_enc_conf=curr_enc_conf)
+                 curr_enc_conf=None
+                 ):
+        super(MultiStepInputGraphNetworkConfig, self).__init__(name=name)
 
-        gnn_conf = RelationalGraphNetworkConfig().gnn_conf
+        gnn_conf = RelationalGraphNetworkConfig().gnn
 
-        self.hist_rnn_conf = {
-            'prefix': 'hist_rnn',
+        self.hist_rnn = {
             'rnn_type': 'GRU',
             'input_size': 17,
             'hidden_size': 32,
             'num_layers': 2,
             'batch_first': True
-        }
+        } if hist_rnn_conf is None else hist_rnn_conf
 
-        self.hist_enc_conf = {'prefix': 'hist_enc_conf'}.update(gnn_conf)
-
-        self.curr_enc_conf = {'prefix': 'curr_enc_conf'}.update(gnn_conf)
+        self.hist_enc = gnn_conf if hist_enc_conf is None else hist_enc_conf
+        self.curr_enc = gnn_conf if curr_enc_conf is None else curr_enc_conf
 
 
 class MultiStepInputGraphNetwork(torch.nn.Module):

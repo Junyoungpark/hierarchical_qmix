@@ -19,32 +19,6 @@ class ConfigBase:
     def __init__(self, name: str, **kwargs):
         self.name = name  # will be used as the prefix
 
-    # def __setattr__(self, key, value):
-    #     if isinstance(value, dict):
-    #         if key in self.__dict__:
-    #             conf = self.__dict__[key]
-    #             value = self.set_configs(value, conf)
-    #
-    #     self.__dict__[key] = value
-    #
-    # @staticmethod
-    # def set_configs(target_conf_dict, conf):
-    #     if conf is None:
-    #         return
-    #
-    #     for key, val in conf.items():
-    #         if key in target_conf_dict:
-    #             target_conf_dict[key] = val
-    #         else:
-    #             warnings.warn("Unexpected config {} is ignored".format(key))
-    #     return target_conf_dict
-    #
-    # @staticmethod
-    # def get_conf(conf):
-    #     conf = deepcopy(conf)
-    #     _ = conf.pop('prefix')
-    #     return conf
-
     def __call__(self, pass_arg=None, base_prefix=None):
         if base_prefix is None:
             base_prefix = self.name

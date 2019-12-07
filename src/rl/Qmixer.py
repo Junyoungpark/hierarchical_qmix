@@ -7,25 +7,19 @@ from src.nn.RelationalGraphNetwork import RelationalGraphNetwork
 from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNConfig
 
 from src.config.graph_config import NODE_ALLY
-from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
 
 
 class QmixerConfig(ConfigBase):
 
-    def __init__(self, mixer_conf=None, b_net_conf=None, w_net_conf=None):
-        super(QmixerConfig, self).__init__(mixer=mixer_conf,
-                                           b_net=b_net_conf,
-                                           w_net=w_net_conf)
+    def __init__(self, name='qmixer', mixer_conf=None, b_net_conf=None, w_net_conf=None):
+        super(QmixerConfig, self).__init__(name=name)
 
-        self.mixer = {
-            'prefix': 'mixer',
-            'num_clusters': 3,
-        }
-
-        self.b_net = {'prefix': 'mixer-b-net', **MLPConfig().mlp}
-        self.w_net = {'prefix': 'mixer-w-net', **RGNConfig().gnn}
+        self.mixer = {'num_clusters': 3} if mixer_conf is None else mixer_conf
+        self.b_net = MLPConfig().mlp if b_net_conf is None else b_net_conf
+        self.w_net = RGNConfig().gnn if w_net_conf is None else w_net_conf
 
 
 class Qmixer(nn.Module):

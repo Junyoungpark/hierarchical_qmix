@@ -1,33 +1,14 @@
 import torch.nn as nn
 from src.nn.Linear import LinearModule
-from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase
 
 
 class MLPConfig(ConfigBase):
 
-    def __init__(self, mlp_conf=None):
-        super(MLPConfig, self).__init__(mlp=mlp_conf)
-
-        self.mlp = {
-            'prefix': 'mlp',
-            'input_dimension': 32,
-            'output_dimension': 32,
-            'activation': 'mish',
-            'out_activation': None,
-            'num_neurons': [64, 64],
-            'normalization': None,
-            'weight_init': 'xavier',
-            'dropout_probability': 0.0,
-            'use_noisy': False}
-
-
-class rMLPConfig(ConfigBase):
-
     def __init__(self, name='mlp', mlp_conf=None):
-        super(rMLPConfig, self).__init__(name=name, mlp=mlp_conf)
+        super(MLPConfig, self).__init__(name=name)
 
         self.mlp = {
-            'prefix': 'mlp',
             'input_dimension': 32,
             'output_dimension': 32,
             'activation': 'mish',
@@ -36,7 +17,7 @@ class rMLPConfig(ConfigBase):
             'normalization': None,
             'weight_init': 'xavier',
             'dropout_probability': 0.0,
-            'use_noisy': False}
+            'use_noisy': False} if mlp_conf is None else mlp_conf
 
 
 class MultiLayerPerceptron(nn.Module):
@@ -99,3 +80,6 @@ class MultiLayerPerceptron(nn.Module):
             _list_type = False
 
         return _list_type
+
+if __name__=="__main__":
+    A = MLPConfig()
