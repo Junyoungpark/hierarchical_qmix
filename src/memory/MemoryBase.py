@@ -6,12 +6,11 @@ from src.memory.Trajectory import Trajectory
 
 
 class NstepMemoryConfig(ConfigBase):
-    def __init__(self, memory_conf=None):
-        super(NstepMemoryConfig, self).__init__(memory=memory_conf)
+    def __init__(self, name='nstepmemory', memory_conf=None):
+        super(NstepMemoryConfig, self).__init__(name=name, memory=memory_conf)
         spec = namedtuple('exp_args', ['state', 'action', 'reward', 'next_state', 'done', 'ret'],
                           defaults=tuple([list() for _ in range(6)])),
         self.memory = {
-            'prefix': 'memory',
             'spec': spec,
             'max_n_episodes': 3000,
             'gamma': 0.9,

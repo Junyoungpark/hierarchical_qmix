@@ -12,12 +12,12 @@ class QmixAgentConfig(ConfigBase):
     def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
                  buffer_conf=None):
         super(QmixAgentConfig, self).__init__(name=name, qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf,
-                                              buffer=buffer_conf)
+                                              fit=fit_conf, buffer=buffer_conf)
         self.qnet = QnetConfig()
         self.mixer = QmixerConfig()
         self.brain = QmixBrainConfig()
-        self.fit = {'batch_size': 256} if fit_conf is None else fit_conf
-        self.buffer = NstepMemoryConfig() if buffer_conf is None else buffer_conf
+        self.fit = {'batch_size': 256}
+        self.buffer = NstepMemoryConfig()
 
 
 class QmixAgent(torch.nn.Module):

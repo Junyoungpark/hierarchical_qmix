@@ -8,7 +8,7 @@ from src.util.train_util import dn
 
 class QmixBrainConfig(ConfigBase):
     def __init__(self, name='qmixbrain', brain_conf=None, fit_conf=None):
-        super(QmixBrainConfig, self).__init__(name=name)
+        super(QmixBrainConfig, self).__init__(name=name, brain=brain_conf, fit=fit_conf)
 
         self.brain = {
             'optimizer': 'lookahead',
@@ -19,13 +19,13 @@ class QmixBrainConfig(ConfigBase):
             'eps_min': 0.01,
             'use_double_q': False,
             'use_clipped_q': True
-        } if brain_conf is None else brain_conf
+        }
 
         self.fit = {
             'tau': 0.1,
             'auto_norm_clip': False,
             'auto_norm_clip_base_val': 0.1
-        } if fit_conf is None else fit_conf
+        }
 
 
 class QmixBrain(BrainBase):
