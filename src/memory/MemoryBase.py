@@ -19,6 +19,9 @@ class NstepMemoryConfig(ConfigBase):
             'N': 2
         }
 
+    def __call__(self, base_prefix):
+        return super(NstepMemoryConfig, self).__call__(pass_arg='spec', base_prefix=base_prefix)
+
 
 class NstepMemory:
     def __init__(self, conf):

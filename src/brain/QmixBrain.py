@@ -23,8 +23,9 @@ class QmixBrainConfig(ConfigBase):
 
         self.fit = {
             'tau': 0.1,
-            'auto_norm_clip': False,
-            'auto_norm_clip_base_val': 0.1
+            'auto_norm_clip': True,
+            'auto_norm_clip_base_val': 0.1,
+            'norm_clip_val': 1.0
         }
 
 
@@ -91,7 +92,7 @@ class QmixBrain(BrainBase):
             qs, _ = qs.max(dim=1)
         else:
             qs = qs.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
-        q_tot = mixer(inputs['curr_graph'], inputs['curr_feature'], qs)
+        q_tot = mixer(inputs['curr_graph'], q_dict['hidden_feat'], qs)
         return q_tot
 
     @staticmethod
@@ -103,7 +104,7 @@ class QmixBrain(BrainBase):
         target_q_dict = target_qnet.compute_qs(**inputs)
         target_q = target_q_dict['qs']
         target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
-        target_q_tot = target_mixer(inputs['curr_graph'], inputs['curr_feature'], target_q)
+        target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
         return target_q_tot
 
     def fit(self, curr_inputs, next_inputs, actions, rewards, dones):

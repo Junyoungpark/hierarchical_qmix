@@ -1,0 +1,151 @@
+diff --git a/src/agent/QmixAgent.py b/src/agent/QmixAgent.py
+index 8450223..f53dd33 100644
+--- a/src/agent/QmixAgent.py
++++ b/src/agent/QmixAgent.py
+@@ -12,6 +12,7 @@ from src.util.graph_util import get_largest_number_of_enemy_nodes
+ from src.config.ConfigBase import ConfigBase
+ from src.memory.MemoryBase import NstepMemoryConfig, NstepMemory
+ 
++
+ class QmixAgentConfig(ConfigBase):
+     def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
+                  buffer_conf=None):
+diff --git a/src/brain/QmixBrain.py b/src/brain/QmixBrain.py
+index 17cd6d6..affbcda 100644
+--- a/src/brain/QmixBrain.py
++++ b/src/brain/QmixBrain.py
+@@ -23,8 +23,9 @@ class QmixBrainConfig(ConfigBase):
+ 
+         self.fit = {
+             'tau': 0.1,
+-            'auto_norm_clip': False,
+-            'auto_norm_clip_base_val': 0.1
++            'auto_norm_clip': True,
++            'auto_norm_clip_base_val': 0.1,
++            'norm_clip_val': 1.0
+         }
+ 
+ 
+@@ -91,7 +92,7 @@ class QmixBrain(BrainBase):
+             qs, _ = qs.max(dim=1)
+         else:
+             qs = qs.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
+-        q_tot = mixer(inputs['curr_graph'], inputs['curr_feature'], qs)
++        q_tot = mixer(inputs['curr_graph'], q_dict['hidden_feat'], qs)
+         return q_tot
+ 
+     @staticmethod
+@@ -103,7 +104,7 @@ class QmixBrain(BrainBase):
+         target_q_dict = target_qnet.compute_qs(**inputs)
+         target_q = target_q_dict['qs']
+         target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
+-        target_q_tot = target_mixer(inputs['curr_graph'], inputs['curr_feature'], target_q)
++        target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
+         return target_q_tot
+ 
+     def fit(self, curr_inputs, next_inputs, actions, rewards, dones):
+diff --git a/src/rl/QmixNetwork.py b/src/rl/QmixNetwork.py
+index 0516700..8ce88ea 100644
+--- a/src/rl/QmixNetwork.py
++++ b/src/rl/QmixNetwork.py
+@@ -13,10 +13,12 @@ class QmixNetworkConfig(ConfigBase):
+         super(QmixNetworkConfig, self).__init__(name=name, submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
+                                                 supmixer_mlp=supmixer_mlp_conf)
+         self.submixer = QmixerConfig()
+-        self.supmixer_gc = {'in_features': 19,
++        self.supmixer_gc = {'in_features': 51,
+                             'out_features': 1,
+                             'bias': True}
+         self.supmixer_mlp = MLPConfig().mlp
++        self.supmixer_mlp['input_dimension'] = 51
++        self.supmixer_mlp['output_dimension'] = 1
+ 
+ 
+ class QmixNetwork(torch.nn.Module):
+@@ -50,19 +52,20 @@ class QmixNetwork(torch.nn.Module):
+         #### slow implementation ####
+ 
+         sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
++        sup_ws = torch.nn.functional.softplus(sup_ws)
+ 
+         sup_weighted_qs = sup_ws * aggregated_q.unsqueeze(dim=-1)  # [#. graph x #.cluster x 1]
+         sup_qs = sup_weighted_qs.sum(dim=1)
+ 
+-        if isinstance(graph, dgl.BatchedDGLGraph):
+-            num_graphs = graph.batch_size
+-        else:
+-            num_graphs = 1
++        # if isinstance(graph, dgl.BatchedDGLGraph):
++        #     num_graphs = graph.batch_size
++        # else:
++        #     num_graphs = 1
+ 
+-        sup_q_bs = self.supmixer_b((aggregated_feat.view(num_graphs, -1)))  # [#. graph x  1]
++        sup_q_bs = self.supmixer_b((aggregated_feat.sum(dim=1)))  # [#. graph x  1]
+         sup_qs = sup_qs + sup_q_bs
+ 
+-        return sup_qs
++        return sup_qs.view(-1)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/src/rl/Qmixer.py b/src/rl/Qmixer.py
+index 93429d0..e09727a 100644
+--- a/src/rl/Qmixer.py
++++ b/src/rl/Qmixer.py
+@@ -10,7 +10,7 @@ from src.config.graph_config import NODE_ALLY
+ from src.config.ConfigBase import ConfigBase
+ 
+ from src.util.graph_util import get_filtered_node_index_by_type
+-from src.util.train_util import dn
++
+ 
+ class QmixerConfig(ConfigBase):
+ 
+@@ -19,10 +19,11 @@ class QmixerConfig(ConfigBase):
+ 
+         self.mixer = {'num_clusters': 3}
+         self.b_net = MLPConfig().mlp
+-        self.b_net['input_dimension'] = 19
++        self.b_net['input_dimension'] = 51
+         self.b_net['output_dimension'] = self.mixer['num_clusters']
+ 
+         self.w_net = RGNConfig().gnn
++        self.w_net['input_node_dim'] = 51
+         self.w_net['output_node_dim'] = self.mixer['num_clusters']
+ 
+ 
+@@ -44,6 +45,7 @@ class Qmixer(nn.Module):
+         ws = self.w_net(graph, node_feature)  # [#. allies x #. clusters]
+         ally_indices = get_filtered_node_index_by_type(graph, NODE_ALLY)
+         ally_ws = ws[ally_indices, :]  # [#. allies x #. clusters]
++        ally_ws = torch.nn.functional.softmax(ally_ws, dim=1)
+         return ally_ws
+ 
+     def get_feat(self, graph, node_feature):
+diff --git a/src/test/test.py b/src/test/test.py
+index 45927dc..715cd91 100644
+--- a/src/test/test.py
++++ b/src/test/test.py
+@@ -1,14 +1,21 @@
++import wandb
++
+ from src.runners.RunnerManager import RunnerConfig, RunnerManager
+ from src.agent.QmixAgent import QmixAgent, QmixAgentConfig
+ 
+ if __name__ == '__main__':
+ 
++    exp_name = "qmix_refac"
+     conf = QmixAgentConfig()
+     agent = QmixAgent(conf)
+ 
+     runner_conf = RunnerConfig(agent=agent)
+     runner = RunnerManager(runner_conf)
+ 
++    wandb.init(project="qmix3", name=exp_name)
++    wandb.watch(agent)
++    wandb.update(conf())
++
+     iters = 0
+     while iters < 100:
+         iters += 1

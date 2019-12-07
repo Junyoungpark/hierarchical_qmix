@@ -1,0 +1,25 @@
+{
+    "root": "C:/Users/joon0/dev/hierarchical_qmix",
+    "program": "C:/Users/joon0/dev/hierarchical_qmix/src/test/test.py",
+    "git": {
+        "remote": "https://github.com/Junyoungpark/hierarchical_qmix.git",
+        "commit": "2d6d12cad527f1961f825a7da7a2b7d481c46f01"
+    },
+    "email": "junyoungpark@kaist.ac.kr",
+    "startedAt": "2019-12-07T13:49:39.356707",
+    "host": "DESKTOP-I7JG3A1",
+    "username": "joon0",
+    "executable": "C:\\Users\\joon0\\Anaconda3\\envs\\gpu_torch130\\python.exe",
+    "os": "Windows-10-10.0.17763-SP0",
+    "python": "3.7.4",
+    "gpu": "GeForce RTX 2060",
+    "gpu_count": 1,
+    "cpu_count": 4,
+    "args": [],
+    "state": "running",
+    "jobType": null,
+    "mode": "run",
+    "name": "qmix_refac",
+    "project": "qmix3",
+    "heartbeatAt": "2019-12-07T13:50:45.707321"
+}

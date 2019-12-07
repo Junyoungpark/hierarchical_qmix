@@ -12,6 +12,7 @@ from src.util.graph_util import get_largest_number_of_enemy_nodes
 from src.config.ConfigBase import ConfigBase
 from src.memory.MemoryBase import NstepMemoryConfig, NstepMemory
 
+
 class QmixAgentConfig(ConfigBase):
     def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
                  buffer_conf=None):

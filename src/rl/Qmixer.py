@@ -10,7 +10,7 @@ from src.config.graph_config import NODE_ALLY
 from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
-from src.util.train_util import dn
+
 
 class QmixerConfig(ConfigBase):
 
@@ -19,10 +19,11 @@ class QmixerConfig(ConfigBase):
 
         self.mixer = {'num_clusters': 3}
         self.b_net = MLPConfig().mlp
-        self.b_net['input_dimension'] = 19
+        self.b_net['input_dimension'] = 51
         self.b_net['output_dimension'] = self.mixer['num_clusters']
 
         self.w_net = RGNConfig().gnn
+        self.w_net['input_node_dim'] = 51
         self.w_net['output_node_dim'] = self.mixer['num_clusters']
 
 
@@ -44,6 +45,7 @@ class Qmixer(nn.Module):
         ws = self.w_net(graph, node_feature)  # [#. allies x #. clusters]
         ally_indices = get_filtered_node_index_by_type(graph, NODE_ALLY)
         ally_ws = ws[ally_indices, :]  # [#. allies x #. clusters]
+        ally_ws = torch.nn.functional.softmax(ally_ws, dim=1)
         return ally_ws
 
     def get_feat(self, graph, node_feature):

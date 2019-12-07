@@ -1,0 +1,9 @@
+{
+    "_runtime": 78.52908086776733,
+    "epsilon": 0.8999999761581421,
+    "_timestamp": 1575728140.472528,
+    "_step": 5,
+    "loss": NaN,
+    "train_winning_ratio": 0.09000000000000001,
+    "loss2": NaN
+}

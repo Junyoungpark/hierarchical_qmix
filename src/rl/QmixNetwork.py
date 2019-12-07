@@ -13,10 +13,12 @@ class QmixNetworkConfig(ConfigBase):
         super(QmixNetworkConfig, self).__init__(name=name, submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
                                                 supmixer_mlp=supmixer_mlp_conf)
         self.submixer = QmixerConfig()
-        self.supmixer_gc = {'in_features': 19,
+        self.supmixer_gc = {'in_features': 51,
                             'out_features': 1,
                             'bias': True}
         self.supmixer_mlp = MLPConfig().mlp
+        self.supmixer_mlp['input_dimension'] = 51
+        self.supmixer_mlp['output_dimension'] = 1
 
 
 class QmixNetwork(torch.nn.Module):
@@ -50,19 +52,15 @@ class QmixNetwork(torch.nn.Module):
         #### slow implementation ####
 
         sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
+        sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
 
         sup_weighted_qs = sup_ws * aggregated_q.unsqueeze(dim=-1)  # [#. graph x #.cluster x 1]
         sup_qs = sup_weighted_qs.sum(dim=1)
 
-        if isinstance(graph, dgl.BatchedDGLGraph):
-            num_graphs = graph.batch_size
-        else:
-            num_graphs = 1
-
-        sup_q_bs = self.supmixer_b((aggregated_feat.view(num_graphs, -1)))  # [#. graph x  1]
+        sup_q_bs = self.supmixer_b((aggregated_feat.sum(dim=1)))  # [#. graph x  1]
         sup_qs = sup_qs + sup_q_bs
 
-        return sup_qs
+        return sup_qs.view(-1)
 
 
 if __name__ == "__main__":

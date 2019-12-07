@@ -1,0 +1,6 @@
+{"loss": 8546.4921875, "loss2": 81279.125, "train_winning_ratio": 0.08100000000000002, "epsilon": 0.8999999761581421, "_runtime": 59.69597554206848, "_timestamp": 1575727483.1198506, "_step": 1}
+{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.04782969000000002, "epsilon": 0.8999999761581421, "_runtime": 78.78605270385742, "_timestamp": 1575727502.2099278, "_step": 2}
+{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.028242953648100012, "epsilon": 0.8999999761581421, "_runtime": 97.78781771659851, "_timestamp": 1575727521.2116928, "_step": 3}
+{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.01667718169966658, "epsilon": 0.8999999761581421, "_runtime": 121.84828758239746, "_timestamp": 1575727545.2721627, "_step": 4}
+{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.009847709021836121, "epsilon": 0.8999999761581421, "_runtime": 144.84439611434937, "_timestamp": 1575727568.2682712, "_step": 5}
+{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.005814973700304013, "epsilon": 0.8999999761581421, "_runtime": 165.54480862617493, "_timestamp": 1575727588.9686837, "_step": 6}
