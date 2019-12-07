@@ -11,16 +11,15 @@ from src.nn.MLP import MLPConfig
 class QnetConfig(ConfigBase):
 
     def __init__(self, name='qnet', qnet_conf=None, move_module_conf=None, attack_module_conf=None):
-        super(QnetConfig, self).__init__(name=name)
+        super(QnetConfig, self).__init__(name=name, qnet=qnet_conf, move_module=move_module_conf, attack_module=attack_module_conf)
 
         mlp_conf = MLPConfig().mlp
 
         self.qnet = {'attack_edge_type_index': EDGE_ENEMY,
-                     'ally_node_type_index': NODE_ALLY
-                     } if qnet_conf is None else qnet_conf
+                     'ally_node_type_index': NODE_ALLY}
 
-        self.move_module = mlp_conf if move_module_conf is None else move_module_conf
-        self.attack_module = mlp_conf if attack_module_conf is None else attack_module_conf
+        self.move_module = mlp_conf
+        self.attack_module = mlp_conf
 
 
 class Qnet(nn.Module):

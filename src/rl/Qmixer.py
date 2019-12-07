@@ -15,11 +15,11 @@ from src.util.graph_util import get_filtered_node_index_by_type
 class QmixerConfig(ConfigBase):
 
     def __init__(self, name='qmixer', mixer_conf=None, b_net_conf=None, w_net_conf=None):
-        super(QmixerConfig, self).__init__(name=name)
+        super(QmixerConfig, self).__init__(name=name, mixer=mixer_conf, b_net=b_net_conf, w_net=w_net_conf)
 
-        self.mixer = {'num_clusters': 3} if mixer_conf is None else mixer_conf
-        self.b_net = MLPConfig().mlp if b_net_conf is None else b_net_conf
-        self.w_net = RGNConfig().gnn if w_net_conf is None else w_net_conf
+        self.mixer = {'num_clusters': 3}
+        self.b_net = MLPConfig().mlp
+        self.w_net = RGNConfig().gnn
 
 
 class Qmixer(nn.Module):
@@ -109,5 +109,6 @@ class Qmixer(nn.Module):
 
 
 if __name__ == "__main__":
-    conf = QMixerConfig()
-    QMixer(conf)
+    conf = QmixerConfig()
+    # conf = QMixerConfig()
+    # QMixer(conf)

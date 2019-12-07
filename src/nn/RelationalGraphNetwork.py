@@ -9,11 +9,10 @@ from src.config.graph_config import (NODE_ALLY, NODE_ENEMY,
 
 class RelationalGraphNetworkConfig(ConfigBase):
 
-    def __init__(self, name='gnn_', gnn_conf=None):
-        super(RelationalGraphNetworkConfig, self).__init__(name=name)
+    def __init__(self, name='gnn', gnn_conf=None):
+        super(RelationalGraphNetworkConfig, self).__init__(name=name, gnn=gnn_conf)
 
         self.gnn = {
-            'prefix': 'gnn',
             'input_node_dim': 17,
             'hidden_node_dim': 32,
             'output_node_dim': 16,
@@ -23,7 +22,7 @@ class RelationalGraphNetworkConfig(ConfigBase):
             'updater_conf': MLPConfig().mlp,
             'use_residual': True,
             'use_concat': False,
-        } if gnn_conf is None else gnn_conf
+        }
 
 
 class RelationalGraphNetwork(nn.Module):

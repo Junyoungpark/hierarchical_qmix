@@ -10,12 +10,13 @@ from src.util.graph_util import get_number_of_ally_nodes
 
 class QmixNetworkConfig(ConfigBase):
     def __init__(self, name='qmixnetwork', submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None):
-        super(QmixNetworkConfig, self).__init__(name=name)
-        self.submixer = QmixerConfig() if submixer_conf is None else submixer_conf
+        super(QmixNetworkConfig, self).__init__(name=name, submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
+                                                supmixer_mlp=supmixer_mlp_conf)
+        self.submixer = QmixerConfig()
         self.supmixer_gc = {'in_features': 3,
                             'out_features': 1,
-                            'bias': True} if supmixer_gc_conf is None else supmixer_gc_conf
-        self.supmixer_mlp = MLPConfig().mlp if supmixer_mlp_conf is None else supmixer_mlp_conf
+                            'bias': True}
+        self.supmixer_mlp = MLPConfig().mlp
 
 
 class QmixNetwork(torch.nn.Module):

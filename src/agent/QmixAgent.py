@@ -9,12 +9,13 @@ from src.memory.MemoryBase import NstepMemoryConfig
 
 
 class QmixAgentConfig(ConfigBase):
-    def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None, buffer_conf=None):
-
-        super(QmixAgentConfig, self).__init__(name=name)
-        self.qnet = QnetConfig() if qnet_conf is None else qnet_conf
-        self.mixer = QmixerConfig() if mixer_conf is None else mixer_conf
-        self.brain = QmixBrainConfig() if brain_conf is None else brain_conf
+    def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
+                 buffer_conf=None):
+        super(QmixAgentConfig, self).__init__(name=name, qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf,
+                                              buffer=buffer_conf)
+        self.qnet = QnetConfig()
+        self.mixer = QmixerConfig()
+        self.brain = QmixBrainConfig()
         self.fit = {'batch_size': 256} if fit_conf is None else fit_conf
         self.buffer = NstepMemoryConfig() if buffer_conf is None else buffer_conf
 
@@ -39,10 +40,4 @@ class QmixAgent(torch.nn.Module):
 
 
 if __name__ == '__main__':
-    conf = QmixAgentConf()
-    #     # conf()
-
-    rconf = rQmixAgentConf()
-    rconf()
-    print(conf())
-    print(rconf())
+    conf = QmixAgentConfig()

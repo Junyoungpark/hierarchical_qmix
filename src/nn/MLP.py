@@ -6,7 +6,7 @@ from src.config.ConfigBase import ConfigBase
 class MLPConfig(ConfigBase):
 
     def __init__(self, name='mlp', mlp_conf=None):
-        super(MLPConfig, self).__init__(name=name)
+        super(MLPConfig, self).__init__(name=name, mlp=mlp_conf)
 
         self.mlp = {
             'input_dimension': 32,

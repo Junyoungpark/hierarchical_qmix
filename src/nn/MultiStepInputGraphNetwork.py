@@ -14,7 +14,8 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
                  hist_enc_conf=None,
                  curr_enc_conf=None
                  ):
-        super(MultiStepInputGraphNetworkConfig, self).__init__(name=name)
+        super(MultiStepInputGraphNetworkConfig, self).__init__(name=name, hist_rnn=hist_rnn_conf,
+                                                               hist_enc=hist_enc_conf, curr_enc=curr_enc_conf)
 
         gnn_conf = RelationalGraphNetworkConfig().gnn
 
@@ -23,11 +24,10 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
             'input_size': 17,
             'hidden_size': 32,
             'num_layers': 2,
-            'batch_first': True
-        } if hist_rnn_conf is None else hist_rnn_conf
+            'batch_first': True}
 
-        self.hist_enc = gnn_conf if hist_enc_conf is None else hist_enc_conf
-        self.curr_enc = gnn_conf if curr_enc_conf is None else curr_enc_conf
+        self.hist_enc = gnn_conf
+        self.curr_enc = gnn_conf
 
 
 class MultiStepInputGraphNetwork(torch.nn.Module):
