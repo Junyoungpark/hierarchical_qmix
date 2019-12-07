@@ -32,8 +32,8 @@ class QmixBrain(BrainBase):
     def __init__(self, conf, qnet, mixer, qnet2, mixer2):
         super(QmixBrain, self).__init__()
         self.conf = conf
-        self.brain_conf = conf.brain()
-        self.fit_conf = conf.fit()
+        self.brain_conf = conf.brain
+        self.fit_conf = conf.fit
 
         self.use_double_q = self.brain_conf['use_double_q']
         self.use_clipped_q = self.brain_conf['use_clipped_q']
@@ -54,7 +54,7 @@ class QmixBrain(BrainBase):
         self.mixer = mixer
         self.mixer2 = mixer2
 
-        if self.use_target:
+        if self.use_target_q:
             self.update_target_network(1.0, self.qnet, self.qnet2)
             self.update_target_network(1.0, self.mixer, self.mixer2)
 

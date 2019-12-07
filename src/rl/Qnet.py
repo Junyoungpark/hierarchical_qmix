@@ -29,15 +29,15 @@ class Qnet(nn.Module):
         super(Qnet, self).__init__()
 
         self.conf = conf
-        self.move_module = MoveModule(self.conf.move_module_conf)
-        self.attack_module = AttackModule(self.conf.attack_module_conf)
+        self.move_module = MoveModule(self.conf.move_module)
+        self.attack_module = AttackModule(self.conf.attack_module)
 
     def forward(self, graph, node_feature, maximum_num_enemy):
         # compute move qs
         move_argument = self.move_module(graph, node_feature)
 
         # compute attack qs
-        attack_edge_type_index = self.conf.qnet_conf['attack_edge_type_index']
+        attack_edge_type_index = self.conf.qnet['attack_edge_type_index']
         attack_argument = self.attack_module(graph, node_feature, maximum_num_enemy, attack_edge_type_index)
 
         return move_argument, attack_argument
