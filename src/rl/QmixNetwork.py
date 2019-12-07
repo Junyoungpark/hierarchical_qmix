@@ -13,7 +13,7 @@ class QmixNetworkConfig(ConfigBase):
         super(QmixNetworkConfig, self).__init__(name=name, submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
                                                 supmixer_mlp=supmixer_mlp_conf)
         self.submixer = QmixerConfig()
-        self.supmixer_gc = {'in_features': 3,
+        self.supmixer_gc = {'in_features': 19,
                             'out_features': 1,
                             'bias': True}
         self.supmixer_mlp = MLPConfig().mlp

@@ -1,4 +1,5 @@
-from collections import deque, namedtuple
+from collections import deque
+from copy import deepcopy
 import numpy as np
 
 
@@ -51,3 +52,19 @@ class Trajectory:
     @property
     def length(self):
         return len(self._trajectory)
+
+    def __getitem__(self, index):
+        return self._trajectory[index]
+
+    def reset(self):
+        self._trajectory.clear()
+
+    def get_n_samples_from_i(self, n, i):
+        ret_dict = deepcopy((self.spec)._asdict())
+
+        for j in range(i, i + n):
+            sample = sample._asdict()
+            for field, val in sample.items():
+                ret_dict[field].append(val)
+
+        return ret_dict

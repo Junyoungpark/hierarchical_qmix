@@ -42,13 +42,12 @@ class GraphConvolutionLayer(nn.Module):
             adj = self.Laplacian_norm(adj)
 
         support = input.matmul(self.weight)  # [# graphs x # nodes per graph x # out_feat_dim]
-        output = support.bmm(adj)
+        output = adj.bmm(support)
 
         if self.bias is not None:
             output = output + self.bias
 
         return output
-
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' \

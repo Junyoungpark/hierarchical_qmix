@@ -1,4 +1,3 @@
-from src.environments.MicroTestEnvironment import MicroTestEnvironment
 from src.runners.RunnerManager import RunnerConfig, RunnerManager
 from src.agent.QmixAgent import QmixAgent, QmixAgentConfig
 
@@ -13,6 +12,9 @@ if __name__ == '__main__':
     iters = 0
     while iters < 100:
         iters += 1
-        runner.sample(2)
+        runner.sample(1)
         runner.transfer_sample()
-        print("test")
+
+        agent.to('cuda')
+        agent.fit(device='cuda')
+        agent.to('cpu')

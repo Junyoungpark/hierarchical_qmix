@@ -10,7 +10,7 @@ from src.config.graph_config import NODE_ALLY
 from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
-
+from src.util.train_util import dn
 
 class QmixerConfig(ConfigBase):
 
@@ -19,7 +19,11 @@ class QmixerConfig(ConfigBase):
 
         self.mixer = {'num_clusters': 3}
         self.b_net = MLPConfig().mlp
+        self.b_net['input_dimension'] = 19
+        self.b_net['output_dimension'] = self.mixer['num_clusters']
+
         self.w_net = RGNConfig().gnn
+        self.w_net['output_node_dim'] = self.mixer['num_clusters']
 
 
 class Qmixer(nn.Module):
@@ -31,10 +35,7 @@ class Qmixer(nn.Module):
         self.num_clusters = conf.mixer['num_clusters']
 
         b_net_conf = conf.b_net
-        b_net_conf['output_dimension'] = self.num_clusters
-
         w_net_conf = conf.w_net
-        w_net_conf['output_node_dim'] = self.num_clusters
 
         self.q_b_net = MLP(**b_net_conf)
         self.w_net = RelationalGraphNetwork(**w_net_conf)
@@ -52,24 +53,20 @@ class Qmixer(nn.Module):
 
         num_allies, feat_dim = ally_node_feature.shape[0], ally_node_feature.shape[1]
 
+        ally_node_feature = ally_node_feature.unsqueeze(dim=-1)
         ally_node_feature = ally_node_feature.repeat(1, 1, self.num_clusters)  # [#. allies x feature dim x #. clusters]
 
         # [#. allies x feature dim x #. cluster]
-        weighted_feat = ws.view(num_allies,
-                                feat_dim,
-                                self.num_clusters) * ally_node_feature.unsqueeze(dim=-1)
+        weighted_feat = ws.view(num_allies, 1, self.num_clusters) * ally_node_feature
 
-        graph.ndata['weighted_feat'] = weighted_feat.view(num_allies, -1)
+        _wf = torch.zeros(size=(graph.number_of_nodes(), feat_dim, self.num_clusters), device=ws.device)
+        _wf[ally_indices, :] = weighted_feat
+
+        graph.ndata['weighted_feat'] = _wf
         weighted_feat = dgl.sum_nodes(graph, 'weighted_feat')  # [#. graph x feature dim x #. clusters]
         _ = graph.ndata.pop('weighted_feat')
 
-        if isinstance(graph, dgl.BatchedDGLGraph):
-            num_graphs = graph.batch_size
-        else:
-            num_graphs = 1
-
-        weighted_feat = weighted_feat.reshape(num_graphs, feat_dim, self.num_clusters)
-        return weighted_feat.transpose(0, 2, 1)  # [#. graph x num_cluster x feature_dim]
+        return weighted_feat.transpose(2, 1)  # [#. graph x num_cluster x feature_dim]
 
     def get_q(self, graph, node_feature, qs):
         device = node_feature.device

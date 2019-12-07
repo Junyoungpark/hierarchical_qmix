@@ -90,8 +90,8 @@ class QmixBrain(BrainBase):
         if actions is None:
             qs, _ = qs.max(dim=1)
         else:
-            qs = qs.gater(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
-        q_tot = mixer.compute_qs(inputs['curr_graph'], inputs['curr_feature'], qs)
+            qs = qs.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
+        q_tot = mixer(inputs['curr_graph'], inputs['curr_feature'], qs)
         return q_tot
 
     @staticmethod
