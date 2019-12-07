@@ -39,6 +39,9 @@ class QmixBrain(BrainBase):
         self.use_clipped_q = self.brain_conf['use_clipped_q']
 
         self.gamma = self.brain_conf['gamma']
+        self.register_buffer('eps', torch.ones(1, ) * self.brain_conf['eps'])
+        self.register_buffer('eps_min', torch.ones(1, ) * self.brain_conf['eps_min'])
+        self.eps_gamma = self.brain_conf['eps_gamma']
 
         if int(self.use_double_q) + int(self.use_clipped_q) >= 2:
             warnings.warn("Either one of 'use_double_q' or 'clipped_q' can be true. 'use_double_q' set to be false.")
@@ -68,7 +71,8 @@ class QmixBrain(BrainBase):
             params = list(self.qnet2.parameters()) + list(self.mixer2.parameters())
             self.qnet2_optimizer = self.set_optimizer(target_opt=optimizer, lr=lr, params=params)
 
-    def get_action(self, inputs, use_q1=True):
+    def get_action(self, use_q1=True, **inputs):
+        inputs["eps"] = self.eps
 
         if use_q1:
             qnet = self.qnet
@@ -76,6 +80,7 @@ class QmixBrain(BrainBase):
             qnet = self.qnet2
 
         nn_actions, info_dict = qnet.get_action(**inputs)
+
         return nn_actions, info_dict
 
     @staticmethod

@@ -6,6 +6,8 @@ from src.environments.SC2BotAI import SimpleSC2BotAI
 
 from src.config.nn_config import VERY_LARGE_NUMBER
 from src.util.sc2_util import get_random_action
+from src.util.reward_func import victory_if_zero_enemy
+from src.util.state_process_func import process_game_state_to_dgl
 
 
 class Status(enum.Enum):
@@ -15,8 +17,13 @@ class Status(enum.Enum):
 
 class MicroTestEnvironment(SC2EnvironmentBase):
 
-    def __init__(self, map_name, reward_func, state_proc_func, realtime=False, max_steps=25000,
-                 winning_ratio_gamma=0.1, frame_skip_rate=1):
+    def __init__(self, map_name,
+                 reward_func=victory_if_zero_enemy,
+                 state_proc_func=process_game_state_to_dgl,
+                 realtime=False,
+                 max_steps=25000,
+                 winning_ratio_gamma=0.1,
+                 frame_skip_rate=2):
         """
         :param map_name:
         :param reward_func:
@@ -104,7 +111,7 @@ class MicroTestEnvironment(SC2EnvironmentBase):
                 _ = self.reset()
 
             gamma = self.winning_ratio_gamma
-            self.winning_ratio = gamma * win + (1-gamma) * self.winning_ratio
+            self.winning_ratio = gamma * win + (1 - gamma) * self.winning_ratio
 
         return next_state, reward, done
 

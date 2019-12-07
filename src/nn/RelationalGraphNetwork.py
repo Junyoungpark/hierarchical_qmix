@@ -13,7 +13,7 @@ class RelationalGraphNetworkConfig(ConfigBase):
         super(RelationalGraphNetworkConfig, self).__init__(name=name, gnn=gnn_conf)
 
         self.gnn = {
-            'input_node_dim': 17,
+            'input_node_dim': 19,
             'hidden_node_dim': 32,
             'output_node_dim': 16,
             'num_hidden_layers': 2,

@@ -1,9 +1,9 @@
-from collections import deque
+from collections import deque, namedtuple
 import numpy as np
 
 
 class Trajectory:
-    def __init__(self, gamma, max_len, spec):
+    def __init__(self, gamma, spec, max_len=30):
         self.spec = spec
         self.gamma = gamma
         self._trajectory = deque(maxlen=max_len)

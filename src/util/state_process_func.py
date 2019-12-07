@@ -6,6 +6,7 @@ from src.config.graph_config import NODE_ALLY, NODE_ENEMY, EDGE_ALLY, EDGE_ENEMY
     EDGE_ALLY_TO_ENEMY, NUM_EDGE_TYPES, NUM_NODE_TYPES
 from src.util.graph_util import minus_large_num_initializer
 from src.util.sc2_config import NUM_TOTAL_TYPES, type2onehot
+import numpy as np
 
 
 def process_game_state_to_dgl(game_state: GameState):
@@ -96,7 +97,8 @@ def process_game_state_to_dgl(game_state: GameState):
             enemies_health_percentage += enemy_unit.health_percentage
 
     if num_allies + num_enemies >= 1:
-        node_features = torch.stack(node_features)  # [Num total units x Num features]
+        node_features = np.stack(node_features)  # [Num total units x Num features]
+        node_features = torch.Tensor(node_features)
 
         node_types = torch.Tensor(node_types).reshape(-1)
 

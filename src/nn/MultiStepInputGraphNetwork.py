@@ -21,7 +21,7 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
 
         self.hist_rnn = {
             'rnn_type': 'GRU',
-            'input_size': 17,
+            'input_size': 19,
             'hidden_size': 32,
             'num_layers': 2,
             'batch_first': True}
@@ -36,19 +36,19 @@ class MultiStepInputGraphNetwork(torch.nn.Module):
         super(MultiStepInputGraphNetwork, self).__init__()
         self.conf = conf
 
-        rnn_conf = conf.hist_rnn_conf
+        rnn_conf = conf.hist_rnn
         rnn_type = rnn_conf.pop('rnn_type')
         rnn = getattr(torch.nn, rnn_type)
         self.hist_rnn = rnn(**rnn_conf)
 
-        hist_enc_conf = conf.hist_enc_conf
+        hist_enc_conf = conf.hist_enc
         self.hist_one_step_enc = RelationalGraphNetwork(**hist_enc_conf)
 
         self.hist_encoder = RNNEncoder(rnn=self.hist_rnn, one_step_encoder=self.hist_one_step_enc)
 
-        curr_enc_conf = conf.curr_enc_conf
+        curr_enc_conf = conf.curr_enc
         self.curr_encoder = RelationalGraphNetwork(**curr_enc_conf)
-        self.out_dim = curr_enc_conf['model_dim'] + rnn_conf['hidden_size']
+        self.out_dim = curr_enc_conf['output_node_dim'] + rnn_conf['hidden_size']
 
     def forward(self, num_time_steps, hist_graph, hist_feature,
                 curr_graph, curr_feature):
