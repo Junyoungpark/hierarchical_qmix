@@ -3,7 +3,6 @@ import math
 import torch
 import torch.nn as nn
 from torch.nn.parameter import Parameter
-from src.nn.activations import get_nn_activation
 
 
 class GraphConvolutionLayer(nn.Module):

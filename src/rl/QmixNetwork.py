@@ -4,20 +4,18 @@ import torch
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
 from src.nn.GraphConvolution import GraphConvolutionLayer
 from src.rl.Qmixer import Qmixer, QmixerConfig
-from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 
 
 class QmixNetworkConfig(ConfigBase):
-    def __init__(self, submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None):
-        super(QmixNetworkConfig, self).__init__(submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
-                                                supmixer_mlp=supmixer_mlp_conf)
-        self.submixer = QmixerConfig()
-        self.supmixer_mlp = {'prefix': 'supmixer_mlp', **MLPConfig().mlp}
-        self.supmixer_gc = {'prefix': 'supmixer_gc',
-                            'in_features': 3,
+    def __init__(self, name='qmixnetwork', submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None):
+        super(QmixNetworkConfig, self).__init__(name=name)
+        self.submixer = QmixerConfig() if submixer_conf is None else submixer_conf
+        self.supmixer_gc = {'in_features': 3,
                             'out_features': 1,
-                            'bias': True}
+                            'bias': True} if supmixer_gc_conf is None else supmixer_gc_conf
+        self.supmixer_mlp = MLPConfig().mlp if supmixer_mlp_conf is None else supmixer_mlp_conf
 
 
 class QmixNetwork(torch.nn.Module):
