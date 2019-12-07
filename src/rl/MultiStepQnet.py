@@ -1,3 +1,5 @@
+import torch.nn as nn
+
 from src.nn.MultiStepInputGraphNetwork import MultiStepInputGraphNetwork, MultiStepInputGraphNetworkConfig
 from src.rl.Qnet import Qnet, QnetConfig
 from src.config.ConfigBase import ConfigBase
@@ -10,11 +12,14 @@ class MultiStepQnetConfig(ConfigBase):
         self.hist = MultiStepInputGraphNetworkConfig()
 
 
-class MultiStepQnet(Qnet):
+class MultiStepQnet(nn.Module):
 
     def __init__(self, conf):
-        super(MultiStepQnet, self).__init__(conf=conf.qnet)
+        super(MultiStepQnet, self).__init__()
         self.encoder = MultiStepInputGraphNetwork(conf.hist)
+        conf.qnet.move_module['input_dimension'] = self.encoder.out_dim
+        conf.qnet.attack_module['input_dimension'] = self.encoder.out_dim
+        self.qnet = Qnet(conf.qnet)
 
     def forward(self,
                 num_time_steps,
@@ -26,9 +31,9 @@ class MultiStepQnet(Qnet):
                                                          curr_graph,
                                                          curr_feature)
 
-        move_arg, attack_arg = super()(graph=curr_graph,
-                                       node_feature=hist_current_encoded_node_feature,
-                                       maximum_num_enemy=maximum_num_enemy)
+        move_arg, attack_arg = self.qnet(graph=curr_graph,
+                                         node_feature=hist_current_encoded_node_feature,
+                                         maximum_num_enemy=maximum_num_enemy)
 
         return move_arg, attack_arg
 
@@ -42,9 +47,9 @@ class MultiStepQnet(Qnet):
                                                          curr_graph,
                                                          curr_feature)
 
-        q_dict = super().compute_qs(curr_graph,
-                                    hist_current_encoded_node_feature,
-                                    maximum_num_enemy)
+        q_dict = self.qnet.compute_qs(curr_graph,
+                                      hist_current_encoded_node_feature,
+                                      maximum_num_enemy)
 
         q_dict['hidden_feat'] = hist_current_encoded_node_feature
         return q_dict
@@ -54,10 +59,9 @@ class MultiStepQnet(Qnet):
                    hist_graph, hist_feature,
                    curr_graph, curr_feature, maximum_num_enemy,
                    eps):
-
         q_dict = self.compute_qs(num_time_steps,
                                  hist_graph, hist_feature,
                                  curr_graph, curr_feature, maximum_num_enemy)
 
-        nn_actions, q_dict = self.get_action_from_q(q_dict=q_dict, eps=eps)
+        nn_actions, q_dict = self.qnet.get_action_from_q(q_dict=q_dict, eps=eps)
         return nn_actions, q_dict

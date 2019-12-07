@@ -9,7 +9,7 @@ class Trajectory:
         self._trajectory = deque(maxlen=max_len)
 
     def push(self, sample):
-        assert self.spec.fields == sample.fields
+        assert self.spec._fields == sample._fields
         self._trajectory.append(sample)
         done = sample.done
         if done:

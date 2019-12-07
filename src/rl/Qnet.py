@@ -19,7 +19,8 @@ class QnetConfig(ConfigBase):
         mlp_conf = MLPConfig().mlp
 
         self.qnet = {'attack_edge_type_index': EDGE_ENEMY,
-                     'ally_node_type_index': NODE_ALLY}
+                     'ally_node_type_index': NODE_ALLY,
+                     'exploration_method': 'eps_greedy'}
 
         self.move_module = mlp_conf
         self.attack_module = mlp_conf
@@ -31,6 +32,7 @@ class Qnet(nn.Module):
                  conf):
         super(Qnet, self).__init__()
         self.conf = conf
+        self.exploration_method = conf.qnet['exploration_method']
         self.move_module = MoveModule(self.conf.move_module)
         self.attack_module = AttackModule(self.conf.attack_module)
 
@@ -51,7 +53,7 @@ class Qnet(nn.Module):
 
         qs = torch.cat((move_arg, attack_arg), dim=-1)  # of all units including enemies
 
-        ally_node_type_index = self.conf.qnet_conf['ally_node_type_index']
+        ally_node_type_index = self.conf.qnet['ally_node_type_index']
         ally_node_indices = get_filtered_node_index_by_type(graph, ally_node_type_index)
         qs = qs[ally_node_indices, :]  # of only ally units
 

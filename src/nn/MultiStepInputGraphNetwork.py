@@ -27,7 +27,11 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
             'batch_first': True}
 
         self.hist_enc = gnn_conf
+        self.hist_enc['input_node_dim'] = 19
+        self.hist_enc['output_node_dim'] = self.hist_rnn['input_size']
+
         self.curr_enc = gnn_conf
+        self.curr_enc['input_node_dim'] = 19
 
 
 class MultiStepInputGraphNetwork(torch.nn.Module):

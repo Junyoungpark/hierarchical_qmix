@@ -16,6 +16,7 @@ class RelationalGraphNetworkConfig(ConfigBase):
             'input_node_dim': 19,
             'hidden_node_dim': 32,
             'output_node_dim': 16,
+            'init_node_dim': 19,
             'num_hidden_layers': 2,
             'node_types': [NODE_ALLY, NODE_ENEMY],
             'edge_types': [EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY],
@@ -30,6 +31,7 @@ class RelationalGraphNetwork(nn.Module):
                  input_node_dim: int,
                  hidden_node_dim: int,
                  output_node_dim: int,
+                 init_node_dim: int,
                  num_hidden_layers: int,
                  node_types: list,
                  edge_types: list,
@@ -51,6 +53,7 @@ class RelationalGraphNetwork(nn.Module):
 
             layer = RelationalGraphLayer(input_node_dim=input_dim,
                                          output_node_dim=output_dim,
+                                         init_node_dim=init_node_dim,
                                          node_types=node_types,
                                          edge_types=edge_types,
                                          updater_conf=updater_conf,

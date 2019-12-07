@@ -35,6 +35,7 @@ class AttackModule(torch.nn.Module):
                  mlp_config: dict):
         super(AttackModule, self).__init__()
         mlp_config['input_dimension'] = mlp_config['input_dimension'] * 2
+        mlp_config['output_dimension'] = 1
         self.attack_argument_calculator = MLP(**mlp_config)
 
     def message_function(self, edges):

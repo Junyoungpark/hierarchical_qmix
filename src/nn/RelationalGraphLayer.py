@@ -17,6 +17,7 @@ class RelationalGraphLayer(nn.Module):
     def __init__(self,
                  input_node_dim: int,
                  output_node_dim: int,
+                 init_node_dim: int,
                  node_types: list,
                  edge_types: list,
                  updater_conf: dict,
@@ -36,6 +37,7 @@ class RelationalGraphLayer(nn.Module):
 
         self.input_dim = input_node_dim
         self.output_dim = output_node_dim
+        self.init_dim = input_node_dim
         self.node_types = node_types
         self.edge_types = edge_types
         self.use_residual = use_residual
@@ -53,17 +55,17 @@ class RelationalGraphLayer(nn.Module):
         # infer input dimensions for node updaters and edge updaters
         if use_concat:
             # edge updater's input : [ node_feat || init_node_feat ]
-            edge_updater_input_dim = input_node_dim * 2
+            edge_updater_input_dim = input_node_dim + init_node_dim
 
             # node updater's input : [ node_feat || #. edge types * node_feat ||  init_node_feat ]
-            node_updater_input_dim = input_node_dim * (len(edge_types) + 2)
+            node_updater_input_dim = input_node_dim + output_node_dim * len(edge_types) + init_node_dim
 
         else:
             # edge updater's input : [ node_feat ]
             edge_updater_input_dim = input_node_dim
 
             # node updater's input : [ node_feat || #. edge types * node_feat ]
-            node_updater_input_dim = input_node_dim * (len(edge_types) + 1)
+            node_updater_input_dim = input_node_dim + output_node_dim * len(edge_types)
 
         self.edge_updater_input_dim = edge_updater_input_dim
         self.node_updater_input_dim = node_updater_input_dim
@@ -72,19 +74,19 @@ class RelationalGraphLayer(nn.Module):
         updater_conf['input_dimension'] = node_updater_input_dim
         updater_conf['output_dimension'] = output_node_dim
 
-        self.node_updaters = nn.ModuleDict()
+        self.node_updater = nn.ModuleDict()
         for ntype_idx in node_types:
             node_updater = MLP(**updater_conf)
-            self.node_updaters['updater{}'.format(ntype_idx)] = node_updater
+            self.node_updater['updater{}'.format(ntype_idx)] = node_updater
 
         # initialize edge updaters
         updater_conf['input_dimension'] = edge_updater_input_dim
         updater_conf['output_dimension'] = output_node_dim
 
-        self.edge_updaters = nn.ModuleDict()
+        self.edge_updater = nn.ModuleDict()
         for etype_idx in edge_types:
             edge_updater = MLP(**updater_conf)
-            self.edge_updaters['updater{}'.format(etype_idx)] = edge_updater
+            self.edge_updater['updater{}'.format(etype_idx)] = edge_updater
 
     def forward(self, graph, node_feature):
         if self.use_concat:
@@ -119,8 +121,8 @@ class RelationalGraphLayer(nn.Module):
 
         msg_dict = dict()
         for i in self.edge_types:
-            msg = torch.zeros(src_node_features.shape[0], self.edge_updater_input_dim, device=device)
-            updater = self.edge_updaters['updater{}'.format(i)]
+            msg = torch.zeros(src_node_features.shape[0], self.output_dim, device=device)
+            updater = self.edge_updater['updater{}'.format(i)]
 
             curr_relation_mask = edge_types == i
             curr_relation_pos = torch.arange(src_node_features.shape[0])[curr_relation_mask]
@@ -136,18 +138,22 @@ class RelationalGraphLayer(nn.Module):
         node_feature = nodes.data['node_feature']
         device = node_feature.device
 
-        node_enc_input = torch.zeros(node_feature.shape[0], self.node_updater_input_dim, device=device)
+        node_enc_input = torch.zeros(node_feature.shape[0],
+                                     self.node_updater_input_dim,
+                                     device=device)
+
         if self.use_concat:
-            node_enc_input[:, :self.input_dim * 2] = F.relu(node_feature)
-            start_index = 2
+            node_enc_input[:, :self.input_dim + self.init_dim] = F.relu(node_feature)
+            start_index = self.input_dim + self.init_dim
         else:
             node_enc_input[:, :self.input_dim] = F.relu(node_feature)
-            start_index = 1
+            start_index = self.input_dim
 
         for i in self.edge_types:
             msg = nodes.mailbox['msg_{}'.format(i)]
             reduced_msg = msg.sum(dim=1)
-            node_enc_input[:, self.input_dim * (i + start_index):self.input_dim * (i + start_index + 1)] = reduced_msg
+            node_enc_input[:, start_index + i * self.output_dim:
+                              start_index + (i+1) * self.output_dim] = reduced_msg
 
         return {'aggregated_node_feature': node_enc_input}
 
