@@ -6,4 +6,6 @@
 __pycache__/
 
 wandb/
-debug.log
+# wandb
+src/test/wandb
+

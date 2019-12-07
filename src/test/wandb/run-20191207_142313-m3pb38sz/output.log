@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:/Users/joon0/dev/hierarchical_qmix/src/test/test.py", line 27, in <module>
+    fit_return_dict = agent.fit(device='cuda')
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\agent\QmixAgent.py", line 154, in fit
+    dones=dones)
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\brain\QmixBrain.py", line 128, in fit
+    action_qnet=self.qnet2)
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\brain\QmixBrain.py", line 106, in _compute_double_qs
+    target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
+AttributeError: 'Tensor' object has no attribute 'suqeeze'

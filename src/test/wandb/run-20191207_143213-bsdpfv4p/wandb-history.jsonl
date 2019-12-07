@@ -1,0 +1,13 @@
+{"loss": 588.9292602539062, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 33.8017041683197, "_timestamp": 1575729150.833944, "_step": 1}
+{"loss": 337.4067687988281, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 41.65047359466553, "_timestamp": 1575729158.6827135, "_step": 2}
+{"loss": 561.43994140625, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 50.76653695106506, "_timestamp": 1575729167.7987769, "_step": 3}
+{"loss": 305.97216796875, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 59.61643838882446, "_timestamp": 1575729176.6486783, "_step": 4}
+{"loss": 307.3929443359375, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 66.08549165725708, "_timestamp": 1575729183.1177316, "_step": 5}
+{"loss": 2113.33154296875, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 74.24367380142212, "_timestamp": 1575729191.2759137, "_step": 6}
+{"loss": 486.2013854980469, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 81.68664145469666, "_timestamp": 1575729198.7188814, "_step": 7}
+{"loss": 1269.247314453125, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 91.28888463973999, "_timestamp": 1575729208.3211246, "_step": 8}
+{"loss": 298.20440673828125, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 98.33459305763245, "_timestamp": 1575729215.366833, "_step": 9}
+{"loss": 1232.8482666015625, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 106.67505669593811, "_timestamp": 1575729223.7072966, "_step": 10}
+{"loss": 477.6894836425781, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 114.70930242538452, "_timestamp": 1575729231.7415423, "_step": 11}
+{"loss": 1279.300048828125, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 122.6709189414978, "_timestamp": 1575729239.7031589, "_step": 12}
+{"loss": 1473.92236328125, "train_winning_ratio": 0.0, "epsilon": 0.8999999761581421, "_runtime": 130.3915719985962, "_timestamp": 1575729247.423812, "_step": 13}

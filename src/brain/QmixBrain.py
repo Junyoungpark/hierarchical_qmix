@@ -14,11 +14,11 @@ class QmixBrainConfig(ConfigBase):
             'optimizer': 'lookahead',
             'lr': 1e-5,
             'gamma': 1.0,
-            'eps': 0.9,
+            'eps': 0.01,
             'eps_gamma': 0.995,
             'eps_min': 0.01,
-            'use_double_q': False,
-            'use_clipped_q': True
+            'use_double_q': True,
+            'use_clipped_q': False
         }
 
         self.fit = {
@@ -103,7 +103,7 @@ class QmixBrain(BrainBase):
 
         target_q_dict = target_qnet.compute_qs(**inputs)
         target_q = target_q_dict['qs']
-        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
+        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
         target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
         return target_q_tot
 
