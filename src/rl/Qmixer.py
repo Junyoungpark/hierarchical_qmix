@@ -7,7 +7,7 @@ from src.nn.RelationalGraphNetwork import RelationalGraphNetwork
 from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNConfig
 
 from src.config.graph_config import NODE_ALLY
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
 

@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from src.rl.ActionModules import MoveModule, AttackModule
 from src.util.graph_util import get_filtered_node_index_by_type
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 from src.config.graph_config import NODE_ALLY, EDGE_ENEMY
 from src.nn.MLP import MLPConfig
 

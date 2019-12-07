@@ -1,7 +1,7 @@
 import torch
 import warnings
 
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 from src.brain.Brainbase import BrainBase
 from src.util.train_util import dn
 

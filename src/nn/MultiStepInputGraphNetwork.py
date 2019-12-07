@@ -3,7 +3,7 @@ import torch
 
 from src.nn.RelationalGraphNetwork import RelationalGraphNetwork, RelationalGraphNetworkConfig
 from src.nn.RNNEncoder import RNNEncoder
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 
 
 class MultiStepInputGraphNetworkConfig(ConfigBase):

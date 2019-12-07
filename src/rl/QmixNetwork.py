@@ -4,7 +4,7 @@ import torch
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
 from src.nn.GraphConvolution import GraphConvolutionLayer
 from src.rl.Qmixer import Qmixer, QmixerConfig
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 
 

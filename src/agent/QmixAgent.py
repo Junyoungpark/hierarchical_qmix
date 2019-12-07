@@ -4,7 +4,7 @@ from src.rl.Qnet import Qnet, QnetConfig
 from src.rl.QmixNetwork import QmixNetwork, QmixerConfig
 from src.brain.QmixBrain import QmixBrain, QmixBrainConfig
 
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 from src.memory.MemoryBase import NstepMemoryConfig
 
 

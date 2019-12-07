@@ -1,6 +1,6 @@
 import torch.nn as nn
 from src.nn.Linear import LinearModule
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 
 
 class MLPConfig(ConfigBase):

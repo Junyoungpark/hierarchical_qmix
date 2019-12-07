@@ -2,7 +2,7 @@ import torch.nn as nn
 from src.nn.RelationalGraphLayer import RelationalGraphLayer
 from src.nn.MLP import MLPConfig
 
-from src.config.ConfigBase_refac import ConfigBase
+from src.config.ConfigBase import ConfigBase
 from src.config.graph_config import (NODE_ALLY, NODE_ENEMY,
                                      EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY)
 
