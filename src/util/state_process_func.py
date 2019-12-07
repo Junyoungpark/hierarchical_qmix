@@ -5,7 +5,7 @@ from sc2.game_state import GameState
 from src.config.graph_config import NODE_ALLY, NODE_ENEMY, EDGE_ALLY, EDGE_ENEMY, EDGE_IN_ATTACK_RANGE, \
     EDGE_ALLY_TO_ENEMY, NUM_EDGE_TYPES, NUM_NODE_TYPES
 from src.util.graph_util import minus_large_num_initializer
-from src.util.sc2unit_config import NUM_TOTAL_TYPES, type2onehot
+from src.util.sc2_config import NUM_TOTAL_TYPES, type2onehot
 
 
 def process_game_state_to_dgl(game_state: GameState):

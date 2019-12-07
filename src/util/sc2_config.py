@@ -1,3 +1,5 @@
+import numpy as np
+
 # Helper dictionary for encoding unit types: python-sc2 unit_typeid -> one-hot position
 
 type2onehot = {9: 0,  # Baneling
