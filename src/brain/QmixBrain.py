@@ -103,7 +103,7 @@ class QmixBrain(BrainBase):
 
         target_q_dict = target_qnet.compute_qs(**inputs)
         target_q = target_q_dict['qs']
-        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
+        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
         target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
         return target_q_tot
 

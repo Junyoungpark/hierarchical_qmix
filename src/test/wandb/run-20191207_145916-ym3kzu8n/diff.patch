@@ -1,0 +1,174 @@
+diff --git a/src/brain/QmixBrain.py b/src/brain/QmixBrain.py
+index affbcda..531661a 100644
+--- a/src/brain/QmixBrain.py
++++ b/src/brain/QmixBrain.py
+@@ -103,7 +103,7 @@ class QmixBrain(BrainBase):
+ 
+         target_q_dict = target_qnet.compute_qs(**inputs)
+         target_q = target_q_dict['qs']
+-        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).suqeeze(dim=-1)
++        target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
+         target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
+         return target_q_tot
+ 
+diff --git a/src/nn/RelationalGraphNetwork.py b/src/nn/RelationalGraphNetwork.py
+index 63c4926..3e535d6 100644
+--- a/src/nn/RelationalGraphNetwork.py
++++ b/src/nn/RelationalGraphNetwork.py
+@@ -14,10 +14,10 @@ class RelationalGraphNetworkConfig(ConfigBase):
+ 
+         self.gnn = {
+             'input_node_dim': 19,
+-            'hidden_node_dim': 32,
++            'hidden_node_dim': 16,
+             'output_node_dim': 16,
+             'init_node_dim': 19,
+-            'num_hidden_layers': 2,
++            'num_hidden_layers': 1,
+             'node_types': [NODE_ALLY, NODE_ENEMY],
+             'edge_types': [EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY],
+             'updater_conf': MLPConfig().mlp,
+diff --git a/src/rl/QmixNetwork.py b/src/rl/QmixNetwork.py
+index 6d815a3..ba66425 100644
+--- a/src/rl/QmixNetwork.py
++++ b/src/rl/QmixNetwork.py
+@@ -52,7 +52,7 @@ class QmixNetwork(torch.nn.Module):
+         #### slow implementation ####
+ 
+         sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
+-        sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
++        sup_ws = torch.nn.functional.softplus(sup_ws)
+ 
+         sup_weighted_qs = sup_ws * aggregated_q.unsqueeze(dim=-1)  # [#. graph x #.cluster x 1]
+         sup_qs = sup_weighted_qs.sum(dim=1)
+diff --git a/src/rl/Qmixer.py b/src/rl/Qmixer.py
+index e09727a..17d8595 100644
+--- a/src/rl/Qmixer.py
++++ b/src/rl/Qmixer.py
+@@ -6,10 +6,10 @@ from src.nn.MLP import MultiLayerPerceptron as MLP, MLPConfig
+ from src.nn.RelationalGraphNetwork import RelationalGraphNetwork
+ from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNConfig
+ 
+-from src.config.graph_config import NODE_ALLY
+ from src.config.ConfigBase import ConfigBase
+ 
+ from src.util.graph_util import get_filtered_node_index_by_type
++from src.config.graph_config import NODE_ALLY, EDGE_ALLY
+ 
+ 
+ class QmixerConfig(ConfigBase):
+@@ -25,6 +25,8 @@ class QmixerConfig(ConfigBase):
+         self.w_net = RGNConfig().gnn
+         self.w_net['input_node_dim'] = 51
+         self.w_net['output_node_dim'] = self.mixer['num_clusters']
++        self.w_net['node_types'] = [NODE_ALLY]
++        self.w_net['edge_types'] = [EDGE_ALLY]
+ 
+ 
+ class Qmixer(nn.Module):
+diff --git a/src/test/wandb/debug.log b/src/test/wandb/debug.log
+index 33eded6..3f677bd 100644
+--- a/src/test/wandb/debug.log
++++ b/src/test/wandb/debug.log
+@@ -1,82 +1,19 @@
+-2019-12-07 23:18:12,307 DEBUG   MainThread:14828 [wandb_config.py:_load_defaults():87] no defaults not found in config-defaults.yaml
+-2019-12-07 23:18:12,364 DEBUG   MainThread:14828 [util.py:is_cygwin_git():318] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
+-2019-12-07 23:18:12,370 DEBUG   MainThread:14828 [cmd.py:execute():724] Popen(['git', 'cat-file', '--batch-check'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=<valid stream>)
+-2019-12-07 23:18:12,437 DEBUG   MainThread:14828 [cmd.py:execute():724] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:12,514 DEBUG   MainThread:14828 [cmd.py:execute():724] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:12,600 DEBUG   MainThread:14828 [run_manager.py:__init__():535] Initialized sync for qmix3/uq6tvwsq
+-2019-12-07 23:18:12,611 INFO    MainThread:14828 [run_manager.py:wrap_existing_process():1115] wrapping existing process 17448
+-2019-12-07 23:18:12,632 DEBUG   MainThread:14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): pypi.org:443
+-2019-12-07 23:18:13,212 DEBUG   MainThread:14828 [connectionpool.py:_make_request():437] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 38505
+-2019-12-07 23:18:13,324 INFO    Thread-18 :14828 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\output.log
+-2019-12-07 23:18:13,491 INFO    MainThread:14828 [run_manager.py:init_run():912] system metrics and metadata threads started
+-2019-12-07 23:18:13,491 INFO    MainThread:14828 [run_manager.py:init_run():946] upserting run before process can begin, waiting at most 10 seconds
+-2019-12-07 23:18:13,512 DEBUG   Thread-43 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:13,948 DEBUG   Thread-43 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 492
+-2019-12-07 23:18:13,957 INFO    Thread-43 :14828 [run_manager.py:_upsert_run():1019] saving patches
+-2019-12-07 23:18:13,958 DEBUG   Thread-43 :14828 [cmd.py:execute():724] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:14,032 DEBUG   Thread-43 :14828 [cmd.py:execute():724] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:14,107 DEBUG   Thread-43 :14828 [cmd.py:execute():724] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:14,189 DEBUG   Thread-43 :14828 [cmd.py:execute():724] Popen(['git', 'version'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:14,340 DEBUG   Thread-43 :14828 [cmd.py:execute():724] Popen(['git', 'merge-base', 'HEAD', '2d6d12cad527f1961f825a7da7a2b7d481c46f01'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+-2019-12-07 23:18:14,414 INFO    Thread-43 :14828 [run_manager.py:_upsert_run():1023] saving pip packages
+-2019-12-07 23:18:14,415 INFO    Thread-43 :14828 [run_manager.py:_upsert_run():1025] initializing streaming files api
+-2019-12-07 23:18:14,417 INFO    Thread-43 :14828 [run_manager.py:_upsert_run():1032] unblocking file change observer, beginning sync with W&B servers
+-2019-12-07 23:18:14,418 INFO    MainThread:14828 [run_manager.py:wrap_existing_process():1132] informing user process we are ready to proceed
+-2019-12-07 23:18:14,418 INFO    Thread-18 :14828 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:18:14,425 INFO    MainThread:14828 [run_manager.py:_sync_etc():1239] entering loop for messages from user process
+-2019-12-07 23:18:14,426 INFO    Thread-18 :14828 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\diff.patch
+-2019-12-07 23:18:14,426 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:14,791 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:18:15,320 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\output.log
+-2019-12-07 23:18:15,320 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\diff.patch
+-2019-12-07 23:18:15,321 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\config.yaml
+-2019-12-07 23:18:15,352 DEBUG   Thread-68 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:15,502 DEBUG   Thread-18 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:15,511 DEBUG   Thread-70 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:15,792 DEBUG   Thread-68 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 768
+-2019-12-07 23:18:15,800 DEBUG   Thread-68 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-12-07 23:18:15,904 DEBUG   Thread-18 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 None
+-2019-12-07 23:18:15,913 DEBUG   Thread-70 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 752
+-2019-12-07 23:18:15,921 INFO    Thread-18 :14828 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\requirements.txt
+-2019-12-07 23:18:15,923 DEBUG   Thread-70 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-12-07 23:18:16,327 DEBUG   Thread-68 :14828 [connectionpool.py:_make_request():437] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/joon0105/qmix3/uq6tvwsq/wandb-metadata.json?Expires=1575728353&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=Sqq7JQ%2BoXHOMOXv6qao%2F6C93XiYt8o1YdJoN202mZcLGH%2BEBpaBXJtDnYk8QEEB9cnT0iQaKigZA%2BS3U4FIRu%2BFx53KmnB2%2BztHZtRfzBNx9OTi7bqk95N7Dag4PqY4nBrJcmcVm3A9bHji60p7ZVPjV9BprLmFlClQoBjaBmw8k%2F%2F7G1JXOt%2F0OoWegCboTnQDOIA%2Fmlc3Yya2Q0RVENtW4Q8qBkGZ0vY6k%2FsxYn%2BlAV6TCm%2BdXNIGga1%2FgAKGZfDmyskbsUkkx%2Bk1Z290G%2FDfaABdvAUctF292SNgAifYkbg4jFFghIop6NC10ZIRZDeBg3ZKVSGqNjxsGTzwp1Q%3D%3D HTTP/1.1" 200 0
+-2019-12-07 23:18:16,392 DEBUG   Thread-70 :14828 [connectionpool.py:_make_request():437] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/joon0105/qmix3/uq6tvwsq/diff.patch?Expires=1575728353&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=NQ7QZPGv3xj06CFMEabADGiBr94avq6CyVhEdnSTsPvJhqKQDwOi7ddra9R%2FF%2B5pgr9RmJDZqhAj2FMKclKgpB%2F8RYpaKCxmb2yzzcnYLHk3B8h7fddf2vO3%2F1j%2B9lr1yGznVzS2dZE7wB4XwX%2BZf1txZT7LYhFdNwYjn6w1%2BtXUg2csHYNq6cLprmmNEK4nj4tQPU8NMb7e98Bpu4wfC68B84uNB1%2B2XupCk%2B05V7Nx26672%2BY%2FjJng4PTE%2FbD0gGrU6tpfE5%2Bhk5dxDP%2FrujEuDw935%2Bnc3s%2F8TVYCFycDVCQuwqVuWsJy7GPRzbV0pz4VPaFjLK%2Fd2Sci9wjLEQ%3D%3D HTTP/1.1" 200 0
+-2019-12-07 23:18:18,336 DEBUG   Thread-72 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:18,443 DEBUG   Thread-74 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:18,545 DEBUG   Thread-76 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:18,702 DEBUG   Thread-72 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 761
+-2019-12-07 23:18:18,715 DEBUG   Thread-72 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-12-07 23:18:18,813 DEBUG   Thread-74 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 738
+-2019-12-07 23:18:18,822 DEBUG   Thread-74 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-12-07 23:18:18,926 DEBUG   Thread-76 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 758
+-2019-12-07 23:18:18,934 DEBUG   Thread-76 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): storage.googleapis.com:443
+-2019-12-07 23:18:19,194 DEBUG   Thread-72 :14828 [connectionpool.py:_make_request():437] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/joon0105/qmix3/uq6tvwsq/diff.patch?Expires=1575728356&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=KzdtX0ug5aJACenMcwVn7B1Sulp7ZUM%2FI43pzhC6fYe5Uo8vYex%2FP8YAEQfGQ5Qga%2B5kkSbc1W85HO%2Bg6r5J3QNyfILZxFgkcaKJy8ZRkdEzHUIrVVo9oCryoNkVWH8jRA9Ctzmu1EBahLvOGeSAMz3S0PKyyedXRaPPfTvmMC2wU7S%2B1pWfAhh5W%2FORI%2FAes9rBnnoyoqoxkW6qm4dqEDCPB%2BP02bl%2BS29wrqaVXxNh%2BmJ9G3TXwbn7EYL7oK%2BRHLjEZDzp7Uyq6NHb1jvPBqO5ohdp25l0HwsowmWhQ9IVg9NCzJbycaSr9I%2Beu0L47bmaoEUxmuPVGHC37%2FDs6w%3D%3D HTTP/1.1" 200 0
+-2019-12-07 23:18:19,316 DEBUG   Thread-74 :14828 [connectionpool.py:_make_request():437] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/joon0105/qmix3/uq6tvwsq/config.yaml?Expires=1575728356&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=h4tz3WOLxHGen9kil5P5mivV4MGy7hljgwWsSOxqvAXHiJPsqK8aX8ZYaU%2BhZwwT1pPLRG4bOlDlcthUzQojgw%2F9oe1ht80uu38pjAHCKfe%2FvvZtPXL03QxvfQP2BvO%2BzVHkG0ROj4JuwE%2BCLiBwmXl7ZITayu3zbjXh5PZpZDn2eVw3wYVFV3mUnM0VLk7FacwH2WmrTy3kLdRISxXBHMNlOKNuaSP11NHDwMo9PUKA3DL2ydLVRjd4U7p8Yc%2BvOGemvPpWxGVJYS8hZY2%2Fzf%2B1eYcSogIfKHhnCMgqZa18DVAoUfOEHyQVQJrPj%2FNWX1ARIpyvZYXyvfFV0ESkLA%3D%3D HTTP/1.1" 200 0
+-2019-12-07 23:18:19,465 DEBUG   Thread-76 :14828 [connectionpool.py:_make_request():437] https://storage.googleapis.com:443 "PUT /wandb-production.appspot.com/joon0105/qmix3/uq6tvwsq/requirements.txt?Expires=1575728356&GoogleAccessId=gorilla-cloud-storage%40wandb-production.iam.gserviceaccount.com&Signature=X71bvzusXbB%2FyXa%2FHMyqn3upOsDteNS%2BKe%2BI0vKqbh%2F%2FMLvLYKfMCPXORQcwf72CsFb5YT4ROrF5%2FHlCmSvjGkATNrowUFMYeCCygwjWlTm09Bl421Q1aGXIkgfQZE0eJt0NwrhI4gjyvSh%2FPlBmHnT2LIbZjvz5RQVrvBf4bF3i4MTcvuKTzAj2CP8WyJZ4VZ0Y%2BBjlfQHzyLISADZdE%2B%2F8IByb2KrEu3BoSGUFIB%2Blknls6f2ysywS6Zph1eRjMlQE1lWZYJpHoFZvySXQ9LQGeE0pghY6mtXP7hnIu%2FnrVCp%2B18ELn7kk2o7fviIS9EOCLkfaNlVFutc3pg0fdw%3D%3D HTTP/1.1" 200 0
+-2019-12-07 23:18:29,800 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:30,158 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:18:30,341 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:18:43,355 INFO    Thread-18 :14828 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-events.jsonl
+-2019-12-07 23:18:43,368 DEBUG   Thread-28 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:43,823 DEBUG   Thread-28 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /files/joon0105/qmix3/uq6tvwsq/file_stream HTTP/1.1" 200 310
+-2019-12-07 23:18:45,166 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:18:45,540 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:18:46,358 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:19:00,550 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:19:00,935 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:19:02,385 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:19:14,403 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-events.jsonl
+-2019-12-07 23:19:14,661 DEBUG   Thread-28 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /files/joon0105/qmix3/uq6tvwsq/file_stream HTTP/1.1" 200 310
+-2019-12-07 23:19:15,951 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:19:16,338 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:19:18,412 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:19:31,363 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:19:31,752 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:19:34,452 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:19:44,903 DEBUG   Thread-28 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /files/joon0105/qmix3/uq6tvwsq/file_stream HTTP/1.1" 200 310
+-2019-12-07 23:19:45,471 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-events.jsonl
+-2019-12-07 23:19:45,660 DEBUG   Thread-28 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /files/joon0105/qmix3/uq6tvwsq/file_stream HTTP/1.1" 200 310
+-2019-12-07 23:19:46,762 DEBUG   Thread-66 :14828 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
+-2019-12-07 23:19:47,119 DEBUG   Thread-66 :14828 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 46
+-2019-12-07 23:19:50,478 INFO    Thread-18 :14828 [run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
+-2019-12-07 23:19:50,478 INFO    Thread-18 :14828 [uq6tvwsq:run_manager.py:_on_file_modified():682] file/dir modified: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_141808-uq6tvwsq\wandb-metadata.json
++2019-12-07 23:59:17,969 DEBUG   MainThread:14936 [wandb_config.py:_load_defaults():87] no defaults not found in config-defaults.yaml
++2019-12-07 23:59:18,008 DEBUG   MainThread:14936 [util.py:is_cygwin_git():318] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
++2019-12-07 23:59:18,013 DEBUG   MainThread:14936 [cmd.py:execute():724] Popen(['git', 'cat-file', '--batch-check'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=<valid stream>)
++2019-12-07 23:59:18,095 DEBUG   MainThread:14936 [cmd.py:execute():724] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
++2019-12-07 23:59:18,178 DEBUG   MainThread:14936 [cmd.py:execute():724] Popen(['git', 'status', '--porcelain', '--untracked-files'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
++2019-12-07 23:59:18,275 DEBUG   MainThread:14936 [run_manager.py:__init__():535] Initialized sync for qmix3/ym3kzu8n
++2019-12-07 23:59:18,281 INFO    MainThread:14936 [run_manager.py:wrap_existing_process():1115] wrapping existing process 14212
++2019-12-07 23:59:18,284 DEBUG   MainThread:14936 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): pypi.org:443
++2019-12-07 23:59:18,880 DEBUG   MainThread:14936 [connectionpool.py:_make_request():437] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 38505
++2019-12-07 23:59:18,976 INFO    Thread-7  :14936 [run_manager.py:_on_file_created():671] file/dir created: C:\Users\joon0\dev\hierarchical_qmix\src\test\wandb\run-20191207_145916-ym3kzu8n\output.log
++2019-12-07 23:59:19,164 INFO    MainThread:14936 [run_manager.py:init_run():912] system metrics and metadata threads started
++2019-12-07 23:59:19,164 INFO    MainThread:14936 [run_manager.py:init_run():946] upserting run before process can begin, waiting at most 10 seconds
++2019-12-07 23:59:19,173 DEBUG   Thread-20 :14936 [connectionpool.py:_new_conn():959] Starting new HTTPS connection (1): api.wandb.ai:443
++2019-12-07 23:59:19,580 DEBUG   Thread-20 :14936 [connectionpool.py:_make_request():437] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 200 492
++2019-12-07 23:59:19,586 INFO    Thread-20 :14936 [run_manager.py:_upsert_run():1019] saving patches
++2019-12-07 23:59:19,586 DEBUG   Thread-20 :14936 [cmd.py:execute():724] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
++2019-12-07 23:59:19,669 DEBUG   Thread-20 :14936 [cmd.py:execute():724] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
++2019-12-07 23:59:19,752 DEBUG   Thread-20 :14936 [cmd.py:execute():724] Popen(['git', 'diff', '--abbrev=40', '--full-index', '--raw'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
++2019-12-07 23:59:19,851 DEBUG   Thread-20 :14936 [cmd.py:execute():724] Popen(['git', 'version'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)

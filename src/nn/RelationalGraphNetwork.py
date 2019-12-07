@@ -14,10 +14,10 @@ class RelationalGraphNetworkConfig(ConfigBase):
 
         self.gnn = {
             'input_node_dim': 19,
-            'hidden_node_dim': 32,
+            'hidden_node_dim': 8,
             'output_node_dim': 16,
             'init_node_dim': 19,
-            'num_hidden_layers': 2,
+            'num_hidden_layers': 0,
             'node_types': [NODE_ALLY, NODE_ENEMY],
             'edge_types': [EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY],
             'updater_conf': MLPConfig().mlp,

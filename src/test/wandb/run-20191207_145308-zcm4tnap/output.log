@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "C:/Users/joon0/dev/hierarchical_qmix/src/test/test.py", line 27, in <module>
+    fit_return_dict = agent.fit(device='cuda')
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\agent\QmixAgent.py", line 154, in fit
+    dones=dones)
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\brain\QmixBrain.py", line 115, in fit
+    actions=actions)
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\brain\QmixBrain.py", line 95, in _compute_qs
+    q_tot = mixer(inputs['curr_graph'], q_dict['hidden_feat'], qs)
+  File "C:\Users\joon0\Anaconda3\envs\gpu_torch130\lib\site-packages\torch\nn\modules\module.py", line 547, in __call__
+    result = self.forward(*input, **kwargs)
+  File "C:\Users\joon0\dev\hierarchical_qmix\src\rl\QmixNetwork.py", line 55, in forward
+    sup_ws = torch.nn.softplus(sup_ws, dim=1)
+AttributeError: module 'torch.nn' has no attribute 'softplus'

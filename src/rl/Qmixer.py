@@ -6,10 +6,10 @@ from src.nn.MLP import MultiLayerPerceptron as MLP, MLPConfig
 from src.nn.RelationalGraphNetwork import RelationalGraphNetwork
 from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNConfig
 
-from src.config.graph_config import NODE_ALLY
 from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
+from src.config.graph_config import NODE_ALLY, EDGE_ALLY
 
 
 class QmixerConfig(ConfigBase):
@@ -25,6 +25,8 @@ class QmixerConfig(ConfigBase):
         self.w_net = RGNConfig().gnn
         self.w_net['input_node_dim'] = 51
         self.w_net['output_node_dim'] = self.mixer['num_clusters']
+        self.w_net['node_types'] = [NODE_ALLY]
+        self.w_net['edge_types'] = [EDGE_ALLY]
 
 
 class Qmixer(nn.Module):
