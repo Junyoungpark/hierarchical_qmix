@@ -159,3 +159,7 @@ def get_index_mapper(graph, next_graph):
         cur_idx, next_idx = _get_index_mapper_list(graph, next_graph, 0, 0)
 
     return cur_idx, next_idx
+
+
+def minus_large_num_initializer(shape, dtype, ctx, id_range):
+    return torch.ones(shape, dtype=dtype, device=ctx) * - VERY_LARGE_NUMBER
