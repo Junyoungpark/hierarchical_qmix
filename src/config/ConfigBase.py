@@ -40,8 +40,7 @@ class ConfigBase:
         if base_prefix is None:
             base_prefix = self.name
         all_confs = dict()
-        confs = deepcopy(self.__dict__)
-        for conf_key, conf_vals in confs.items():
+        for conf_key, conf_vals in self.__dict__.items():
             if isinstance(conf_vals, dict):
                 conf_vals = deepcopy(conf_vals)
                 prefix = conf_key
@@ -52,8 +51,10 @@ class ConfigBase:
                     conf_name = ' '.join([base_prefix, prefix, conf_k])
                     if isinstance(conf_v, dict):
                         all_confs.update(flatten(conf_v, parent_key=conf_name, sep=" "))
+                        continue
                     if isinstance(conf_v, ConfigBase):
                         all_confs.update(conf_v(base_prefix=conf_name))
+                        continue
                     all_confs[conf_name] = conf_v
             if isinstance(conf_vals, ConfigBase):
                 _cfs = conf_vals(base_prefix=' '.join([self.name, conf_vals.name]))
