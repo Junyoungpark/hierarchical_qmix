@@ -14,16 +14,16 @@ class QmixBrainConfig(ConfigBase):
             'optimizer': 'lookahead',
             'lr': 1e-5,
             'gamma': 1.0,
-            'eps': 0.9,
+            'eps': 0.01,
             'eps_gamma': 0.995,
             'eps_min': 0.01,
-            'use_double_q': False,
-            'use_clipped_q': True
+            'use_double_q': True,
+            'use_clipped_q': False
         }
 
         self.fit = {
-            'tau': 0.1,
-            'auto_norm_clip': True,
+            'tau': 1.0,
+            'auto_norm_clip': False,
             'auto_norm_clip_base_val': 0.1,
             'norm_clip_val': 1.0
         }
