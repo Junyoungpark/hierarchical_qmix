@@ -12,7 +12,6 @@ from src.util.graph_util import get_largest_number_of_enemy_nodes
 from src.config.ConfigBase import ConfigBase
 from src.memory.MemoryBase import NstepMemoryConfig, NstepMemory
 
-
 class QmixAgentConfig(ConfigBase):
     def __init__(self, name='qmixagnet', qnet_conf=None, mixer_conf=None, brain_conf=None, fit_conf=None,
                  buffer_conf=None):
@@ -68,6 +67,9 @@ class QmixAgent(torch.nn.Module):
 
         hist_graph.ndata['node_feature'] = hist_node_feature
         curr_graph.ndata['node_feature'] = curr_node_feature
+
+        curr_graph.ndata.pop('enemy_tag')
+
         return nn_actions, sc2_actions, info_dict
 
     def fit(self, device='cpu'):
