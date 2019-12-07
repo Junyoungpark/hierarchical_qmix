@@ -46,13 +46,12 @@ class rQnetConfig(rConfigBase):
         mlp_conf = rMLPConfig().mlp
 
         self.qnet = {
-            'prefix': 'qnet',
             'attack_edge_type_index': EDGE_ENEMY,
             'ally_node_type_index': NODE_ALLY
         }
 
-        self.move_module = {'prefix': 'qnet-move', **mlp_conf}
-        self.attack_module = {'prefix': 'qnet-attack', **mlp_conf}
+        self.move_module = {**mlp_conf}
+        self.attack_module = {**mlp_conf}
 
 
 class Qnet(nn.Module):

@@ -2,6 +2,7 @@ import torch
 import warnings
 
 from src.config.ConfigBase import ConfigBase
+from src.config.ConfigBase_refac import ConfigBase as rConfigBase
 from src.brain.Brainbase import BrainBase
 from src.util.train_util import dn
 
@@ -24,6 +25,28 @@ class QmixBrainConfig(ConfigBase):
 
         self.fit = {
             'prefix': 'fit',
+            'tau': 0.1,
+            'auto_norm_clip': False,
+            'auto_norm_clip_base_val': 0.1
+        }
+
+
+class rQmixBrainConfig(rConfigBase):
+    def __init__(self, name='qmix_brain', brain_conf=None, fit_conf=None):
+        super(rQmixBrainConfig, self).__init__(name=name, brain=brain_conf, fit=fit_conf)
+
+        self.brain = {
+            'optimizer': 'lookahead',
+            'lr': 1e-5,
+            'gamma': 1.0,
+            'eps': 0.9,
+            'eps_gamma': 0.995,
+            'eps_min': 0.01,
+            'use_double_q': False,
+            'use_clipped_q': True
+        }
+
+        self.fit = {
             'tau': 0.1,
             'auto_norm_clip': False,
             'auto_norm_clip_base_val': 0.1
