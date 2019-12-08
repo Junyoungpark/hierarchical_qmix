@@ -10,6 +10,7 @@ if __name__ == '__main__':
 
     conf = QmixAgentConfig()
     use_noisy_q = conf.brain.brain['use_noisy_q']
+    gamma = conf.brain.brain['gamma']
 
     agent = QmixAgent(conf)
     if use_noisy_q:
@@ -17,6 +18,7 @@ if __name__ == '__main__':
 
     runner_conf = RunnerConfig(agent=agent)
     runner_conf.runner['num_runners'] = 1
+    runner_conf.runner['gamma'] = gamma
     runner_conf.runner['n_hist_steps'] = conf.fit['hist_num_time_steps']
     runner = RunnerManager(runner_conf)
 
