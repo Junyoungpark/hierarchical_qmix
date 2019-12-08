@@ -1,7 +1,10 @@
+import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.parameter import Parameter
+import torch.nn.init as init
 
 from src.nn.activations import get_nn_activation
 
@@ -22,12 +25,14 @@ class NoisyLinear(nn.Linear):
 
     def reset_parameters(self):
         if hasattr(self, 'sigma_weight'):  # Only init after all params added (otherwise super().__init__() fails)
-            torch.nn.init.constant_(self.sigma_weight, self.sigma_init)
-            torch.nn.init.constant_(self.sigma_bias, self.sigma_init)
+            init.uniform_(self.weight, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
+            init.uniform_(self.bias, -math.sqrt(3 / self.in_features), math.sqrt(3 / self.in_features))
+            init.constant_(self.sigma_weight, self.sigma_init)
+            init.constant_(self.sigma_bias, self.sigma_init)
 
     def forward(self, x):
-        return F.linear(x, self.weight + self.sigma_weight * self.epsilon_weight,
-                        self.bias + self.sigma_bias * self.epsilon_bias)
+            return F.linear(x, self.weight + self.sigma_weight * self.epsilon_weight,
+                            self.bias + self.sigma_bias * self.epsilon_bias)
 
     def sample_noise(self):
         self.epsilon_weight = torch.randn(self.out_features, self.in_features)
@@ -56,7 +61,10 @@ class LinearModule(nn.Module):
             linear_layer = torch.nn.Linear(**linear_kwargs)
 
         self.linear_layer = linear_layer
-        self.dropout_layer = torch.nn.Dropout(dropout_p)
+        if dropout_p > 0.0:
+            self.dropout_layer = torch.nn.Dropout(dropout_p)
+        else:
+            self.dropout_layer = torch.nn.Identity()
         self.activation_layer = get_nn_activation(activation)
 
         self.weight_init = weight_init
@@ -92,6 +100,7 @@ class LinearModule(nn.Module):
                 pass
         elif weight_init == "xavier":
             torch.nn.init.xavier_uniform_(tensor.weight)
+            torch.nn.init.constant_(tensor.bias, 0.0)
         else:
             raise NotImplementedError("MLP initializer {} is not supported".format(weight_init))
 

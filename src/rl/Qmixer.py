@@ -9,7 +9,7 @@ from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNCon
 from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
-from src.config.graph_config import NODE_ALLY, EDGE_ALLY
+from src.config.graph_config import NODE_ALLY, NODE_ENEMY, EDGE_ALLY, EDGE_ALLY_TO_ENEMY, EDGE_ENEMY
 
 
 class QmixerConfig(ConfigBase):
@@ -26,6 +26,7 @@ class QmixerConfig(ConfigBase):
         self.w_net = RGNConfig().gnn
         self.w_net['input_node_dim'] = 51
         self.w_net['output_node_dim'] = self.mixer['num_clusters']
+        self.w_net['num_hidden_layers'] = 0
         self.w_net['node_types'] = [NODE_ALLY]
         self.w_net['edge_types'] = [EDGE_ALLY]
 
@@ -51,8 +52,11 @@ class Qmixer(nn.Module):
         ally_ws = torch.nn.functional.softmax(ally_ws, dim=1)
         return ally_ws
 
-    def get_feat(self, graph, node_feature):
-        ws = self.get_w(graph, node_feature)
+    def get_feat(self, graph, node_feature, ws=None):
+
+        if ws is None:
+            ws = self.get_w(graph, node_feature)
+
         ally_indices = get_filtered_node_index_by_type(graph, NODE_ALLY)
         ally_node_feature = node_feature[ally_indices, :]  # [#. allies x feature dim]
 
@@ -73,12 +77,14 @@ class Qmixer(nn.Module):
 
         return weighted_feat.transpose(2, 1)  # [#. graph x num_cluster x feature_dim]
 
-    def get_q(self, graph, node_feature, qs):
+    def get_q(self, graph, node_feature, qs, ws=None):
         device = node_feature.device
         ally_indices = get_filtered_node_index_by_type(graph, NODE_ALLY)
 
         # compute weighted sum of qs
-        ws = self.get_w(graph, node_feature)  # [#. allies x #. clusters]
+        if ws is None:
+            ws = self.get_w(graph, node_feature)  # [#. allies x #. clusters]
+
         weighted_q = qs.view(-1, 1) * ws  # [#. allies x #. clusters]
 
         qs = torch.zeros(size=(graph.number_of_nodes(), self.num_clusters), device=device)
@@ -100,7 +106,7 @@ class Qmixer(nn.Module):
 
     def forward(self, graph, node_feature, qs):
         ws = self.get_w(graph, node_feature)
-        aggregated_feat = self.get_feat(graph, node_feature)
+        aggregated_feat = self.get_feat(graph, node_feature, ws)
         aggregated_q = self.get_q(graph, node_feature, qs)
 
         ret_dict = dict()

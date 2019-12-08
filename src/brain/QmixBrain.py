@@ -13,21 +13,21 @@ class QmixBrainConfig(ConfigBase):
         self.brain = {
             'optimizer': 'lookahead',
             'lr': 1e-5,
-            'gamma': 1.0,
+            'gamma': 0.9,
             'eps': 0.5,
             'eps_gamma': 0.995,
             'eps_min': 0.01,
-            'use_double_q': True,
+            'use_double_q': False,
             'use_clipped_q': True,
             'mixer_use_hidden': True,
-            'use_noisy_q': True
+            'use_noisy_q': False
         }
 
         self.fit = {
             'tau': 0.1,
-            'auto_norm_clip': True,
+            'auto_norm_clip': False,
             'auto_norm_clip_base_val': 0.1,
-            'norm_clip_val': 1.0
+            'norm_clip_val': None
         }
 
 
@@ -63,6 +63,9 @@ class QmixBrain(BrainBase):
 
         if self.use_target_q:
             self.update_target_network(1.0, self.qnet, self.qnet2)
+            self.update_target_network(1.0, self.mixer, self.mixer2)
+
+        if self.use_clipped_q:
             self.update_target_network(1.0, self.mixer, self.mixer2)
 
         # set base optimizer
@@ -176,9 +179,15 @@ class QmixBrain(BrainBase):
                                    clip_val=norm_clip_val)
 
             fit_dict['loss2'] = dn(loss2)
+            fit_dict['loss_tot'] = dn(loss + loss2)
 
         else:
             self.update_target_network(self.fit_conf['tau'], self.qnet, self.qnet2)
             self.update_target_network(self.fit_conf['tau'], self.mixer, self.mixer2)
+
+        # decay epsilon
+        self.eps = self.eps * self.eps_gamma
+        if self.eps <= self.eps_min:
+            self.eps.fill_(self.eps_min.data[0])
 
         return fit_dict
