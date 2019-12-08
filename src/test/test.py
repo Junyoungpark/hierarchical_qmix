@@ -27,7 +27,7 @@ if __name__ == '__main__':
     iters = 0
     while iters < 100:
         iters += 1
-        runner.sample(10)
+        runner.sample(6)
         runner.transfer_sample()
 
         agent.to('cuda')
@@ -37,12 +37,9 @@ if __name__ == '__main__':
         running_wrs = [runner.env.winning_ratio for runner in runner.runners]
         running_wr = np.mean(running_wrs)
 
-        print(iters)
-        print(fit_return_dict)
+        fit_return_dict.update({'train_winning_ratio': running_wr, 'epsilon': agent.brain.eps})
 
         wandb.log(fit_return_dict, step=iters)
-        wandb.log({'train_winning_ratio': running_wr, 'epsilon': agent.brain.eps}, step=iters)
 
         if use_noisy_q:
             agent.sample_noise()
-
