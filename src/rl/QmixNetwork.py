@@ -32,13 +32,12 @@ class QmixNetwork(torch.nn.Module):
 
         self.submixer_conf = conf.submixer
         self.supmixer_gc_conf = conf.supmixer_gc
-        self.supmixer_mlp_conf = conf.supmixer_mlp
 
+        self.supmixer_mlp_conf = conf.supmixer_mlp
         self.submixer = Qmixer(self.submixer_conf)
 
         # choose among two options on supmixer
-
-        self.supmixer = GCN(**self.supmixer_gc_conf) # opt 1: GCN supmixer
+        self.supmixer = GCN(**self.supmixer_gc_conf)  # opt 1: GCN supmixer
         # self.supmixer = MLP(**self.supmixer_mlp_conf) # opt 2: MLP supmixer
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
 
@@ -51,7 +50,7 @@ class QmixNetwork(torch.nn.Module):
         aggregated_q = sub_q_ret_dict['qs']  # [#. graph x #.cluster]
         ws = sub_q_ret_dict['ws']  # [#. allies x #. clusters]
 
-        #### GCN: slow implementation ####
+        ### GCN: slow implementation ####
         graphs = dgl.unbatch(graph)
         nums_ally = get_number_of_ally_nodes(graphs)
 
@@ -61,7 +60,7 @@ class QmixNetwork(torch.nn.Module):
             adj_mats.append(adj_mat)
         adj_mats = torch.stack(adj_mats)  # [#. graph x #. clusters x #. clusters]
         sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
-        #### slow implementation ####
+        ### slow implementation ####
 
         #### MLP Style ####
         # graphs = dgl.unbatch(graph)
@@ -75,7 +74,7 @@ class QmixNetwork(torch.nn.Module):
         # aggregated_feat = aggregated_feat * wss.unsqueeze(dim=-1)  # [# graph X # clusters X feature dim]
         #
         # sup_ws = self.supmixer(aggregated_feat)
-        #### MLP Style ####
+        # #### MLP Style ####
 
         sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
 
