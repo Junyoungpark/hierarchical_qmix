@@ -18,9 +18,9 @@ class QmixBrainConfig(ConfigBase):
             'eps_gamma': 0.995,
             'eps_min': 0.01,
             'use_double_q': True,
-            'use_clipped_q': False,
+            'use_clipped_q': True,
             'mixer_use_hidden': True,
-            'use_noisy_q': False
+            'use_noisy_q': True
         }
 
         self.fit = {

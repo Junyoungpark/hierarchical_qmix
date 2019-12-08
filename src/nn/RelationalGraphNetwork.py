@@ -17,12 +17,12 @@ class RelationalGraphNetworkConfig(ConfigBase):
             'hidden_node_dim': 8,
             'output_node_dim': 16,
             'init_node_dim': 19,
-            'num_hidden_layers': 0,
+            'num_hidden_layers': 2,
             'node_types': [NODE_ALLY, NODE_ENEMY],
             'edge_types': [EDGE_ALLY, EDGE_ENEMY, EDGE_ALLY_TO_ENEMY],
             'updater_conf': MLPConfig().mlp,
             'use_residual': True,
-            'use_concat': False,
+            'use_concat': True,
         }
 
 
