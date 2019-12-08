@@ -9,6 +9,8 @@ from src.config.graph_config import NODE_ALLY, EDGE_ENEMY
 from src.nn.MLP import MLPConfig
 from src.config.nn_config import VERY_LARGE_NUMBER
 
+from src.util.train_util import dn
+
 
 class QnetConfig(ConfigBase):
 
@@ -23,8 +25,11 @@ class QnetConfig(ConfigBase):
                      'exploration_method': 'eps_greedy'}
 
         self.move_module = mlp_conf
+        self.move_module['normalization'] = 'layer'
         self.move_module['out_activation'] = None
+
         self.attack_module = mlp_conf
+        self.attack_module['normalization'] = 'layer'
         self.attack_module['out_activation'] = None
 
 
@@ -54,6 +59,7 @@ class Qnet(nn.Module):
         move_arg, attack_arg = self(graph, node_feature, maximum_num_enemy)
 
         qs = torch.cat((move_arg, attack_arg), dim=-1)  # of all units including enemies
+        np_qs = dn(qs)
 
         ally_node_type_index = self.conf.qnet['ally_node_type_index']
         ally_node_indices = get_filtered_node_index_by_type(graph, ally_node_type_index)
