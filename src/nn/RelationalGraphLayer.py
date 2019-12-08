@@ -37,7 +37,7 @@ class RelationalGraphLayer(nn.Module):
 
         self.input_dim = input_node_dim
         self.output_dim = output_node_dim
-        self.init_dim = input_node_dim
+        self.init_dim = init_node_dim
         self.node_types = node_types
         self.edge_types = edge_types
         self.use_residual = use_residual
