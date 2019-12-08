@@ -3,7 +3,7 @@ import torch.nn as nn
 from src.nn.MultiStepInputGraphNetwork import MultiStepInputGraphNetwork, MultiStepInputGraphNetworkConfig
 from src.rl.Qnet import Qnet, QnetConfig
 from src.config.ConfigBase import ConfigBase
-
+from src.util.train_util import dn
 
 class MultiStepQnetConfig(ConfigBase):
     def __init__(self, name='multistepqnet', qnet_config=None, hist_enc_conf=None):

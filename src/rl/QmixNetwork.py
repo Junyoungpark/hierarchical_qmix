@@ -2,11 +2,11 @@ import dgl
 import torch
 
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
-from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig, RelationalGraphNetwork
 from src.nn.GCN import GCN, GCNConfig
 from src.rl.Qmixer import Qmixer, QmixerConfig
 from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
+from src.util.train_util import dn
 
 
 class QmixNetworkConfig(ConfigBase):

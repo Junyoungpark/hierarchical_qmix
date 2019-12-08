@@ -5,6 +5,7 @@ from src.nn.MLP import MultiLayerPerceptron as MLP
 from src.util.graph_util import get_filtered_edge_index_by_type
 
 from src.config.nn_config import VERY_LARGE_NUMBER
+from src.util.train_util import dn
 
 
 class MoveModule(torch.nn.Module):

@@ -9,6 +9,8 @@ from src.config.graph_config import NODE_ALLY, EDGE_ENEMY
 from src.nn.MLP import MLPConfig
 from src.config.nn_config import VERY_LARGE_NUMBER
 
+from src.util.train_util import dn
+
 
 class QnetConfig(ConfigBase):
 
