@@ -32,15 +32,14 @@ class QmixNetwork(torch.nn.Module):
 
         self.submixer_conf = conf.submixer
         self.supmixer_gc_conf = conf.supmixer_gc
-        self.supmixer_gnn_conf = conf.supmixer_gnn
         self.supmixer_mlp_conf = conf.supmixer_mlp
 
         self.submixer = Qmixer(self.submixer_conf)
 
         # choose among two options on supmixer
 
-        # self.supmixer = GCN(**self.supmixer_gc_conf) # opt 1: GCN supmixer
-        self.supmixer = MLP(**self.supmixer_mlp_conf) # opt 2: MLP supmixer
+        self.supmixer = GCN(**self.supmixer_gc_conf) # opt 1: GCN supmixer
+        # self.supmixer = MLP(**self.supmixer_mlp_conf) # opt 2: MLP supmixer
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
 
         self.n_clusters = self.submixer_conf.mixer['num_clusters']
@@ -53,29 +52,29 @@ class QmixNetwork(torch.nn.Module):
         ws = sub_q_ret_dict['ws']  # [#. allies x #. clusters]
 
         #### GCN: slow implementation ####
-        # graphs = dgl.unbatch(graph)
-        # nums_ally = get_number_of_ally_nodes(graphs)
-        #
-        # adj_mats = []
-        # for w in ws.split(nums_ally):
-        #     adj_mat = w.t().mm(w) + torch.eye(self.n_clusters, device=ws.device)  # [#. clusters x #. clusters]
-        #     adj_mats.append(adj_mat)
-        # adj_mats = torch.stack(adj_mats)  # [#. graph x #. clusters x #. clusters]
-        # sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
-        #### slow implementation ####
-
-        #### MLP Style ####
         graphs = dgl.unbatch(graph)
         nums_ally = get_number_of_ally_nodes(graphs)
 
-        wss = []
+        adj_mats = []
         for w in ws.split(nums_ally):
-            w_agg = w.sum(0)
-            wss.append(w_agg)
-        wss = torch.stack(wss)  # [# graph X # clusters]
-        aggregated_feat = aggregated_feat * wss.unsqueeze(dim=-1)  # [# graph X # clusters X feature dim]
+            adj_mat = w.t().mm(w) + torch.eye(self.n_clusters, device=ws.device)  # [#. clusters x #. clusters]
+            adj_mats.append(adj_mat)
+        adj_mats = torch.stack(adj_mats)  # [#. graph x #. clusters x #. clusters]
+        sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
+        #### slow implementation ####
 
-        sup_ws = self.supmixer(aggregated_feat)
+        #### MLP Style ####
+        # graphs = dgl.unbatch(graph)
+        # nums_ally = get_number_of_ally_nodes(graphs)
+        #
+        # wss = []
+        # for w in ws.split(nums_ally):
+        #     w_agg = w.sum(0)
+        #     wss.append(w_agg)
+        # wss = torch.stack(wss)  # [# graph X # clusters]
+        # aggregated_feat = aggregated_feat * wss.unsqueeze(dim=-1)  # [# graph X # clusters X feature dim]
+        #
+        # sup_ws = self.supmixer(aggregated_feat)
         #### MLP Style ####
 
         sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
