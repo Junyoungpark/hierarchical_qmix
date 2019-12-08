@@ -29,6 +29,7 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
         self.hist_enc = gnn_conf
         self.hist_enc['input_node_dim'] = 19
         self.hist_enc['output_node_dim'] = self.hist_rnn['input_size']
+        self.hist_enc['num_hidden_layers'] = 1
 
         self.curr_enc = gnn_conf
         self.curr_enc['input_node_dim'] = 19

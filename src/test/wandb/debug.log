@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 2019-12-08 16:57:22,034 DEBUG   MainThread:19328 [wandb_config.py:_load_defaults():87] no defaults not found in config-defaults.yaml
 2019-12-08 16:57:22,074 DEBUG   MainThread:19328 [util.py:is_cygwin_git():318] Failed checking if running in CYGWIN due to: FileNotFoundError(2, 'The system cannot find the file specified', None, 2, None)
 2019-12-08 16:57:22,079 DEBUG   MainThread:19328 [cmd.py:execute():724] Popen(['git', 'cat-file', '--batch-check'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=<valid stream>)
@@ -16,3 +17,5 @@
 2019-12-08 16:57:23,603 DEBUG   Thread-20 :19328 [cmd.py:execute():724] Popen(['git', 'rev-parse', '--show-toplevel'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
 2019-12-08 16:57:23,679 DEBUG   Thread-20 :19328 [cmd.py:execute():724] Popen(['git', 'diff', '--cached', '--abbrev=40', '--full-index', '--raw'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
 2019-12-08 16:57:23,764 DEBUG   Thread-20 :19328 [cmd.py:execute():724] Popen(['git', 'version'], cwd=C:\Users\joon0\dev\hierarchical_qmix, universal_newlines=False, shell=None, istream=None)
+=======
+>>>>>>> 7754875fe4ff32a4ff1c267d5d41e8573552f1fd
