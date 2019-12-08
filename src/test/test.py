@@ -16,7 +16,7 @@ if __name__ == '__main__':
         agent.sample_noise()
 
     runner_conf = RunnerConfig(agent=agent)
-    runner_conf.runner['num_runners'] = 2
+    runner_conf.runner['num_runners'] = 1
     runner_conf.runner['n_hist_steps'] = conf.fit['hist_num_time_steps']
     runner = RunnerManager(runner_conf)
 
