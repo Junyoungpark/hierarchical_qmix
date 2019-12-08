@@ -32,13 +32,11 @@ class QmixNetwork(torch.nn.Module):
 
         self.submixer_conf = conf.submixer
         self.supmixer_gc_conf = conf.supmixer_gc
-        #self.supmixer_gnn_conf = conf.supmixer_gnn
-        self.supmixer_mlp_conf = conf.supmixer_mlp
 
+        self.supmixer_mlp_conf = conf.supmixer_mlp
         self.submixer = Qmixer(self.submixer_conf)
 
         # choose among two options on supmixer
-
         self.supmixer = GCN(**self.supmixer_gc_conf)  # opt 1: GCN supmixer
         # self.supmixer = MLP(**self.supmixer_mlp_conf) # opt 2: MLP supmixer
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
@@ -64,7 +62,7 @@ class QmixNetwork(torch.nn.Module):
         sup_ws = self.supmixer(input=aggregated_feat, adj=adj_mats)  # [#. graph x #. clusters x 1]
         ### slow implementation ####
 
-        # #### MLP Style ####
+        #### MLP Style ####
         # graphs = dgl.unbatch(graph)
         # nums_ally = get_number_of_ally_nodes(graphs)
         #
