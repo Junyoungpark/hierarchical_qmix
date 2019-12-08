@@ -11,6 +11,7 @@ from src.util.graph_util import get_largest_number_of_enemy_nodes
 
 from src.config.ConfigBase import ConfigBase
 from src.memory.MemoryBase import NstepMemoryConfig, NstepMemory
+from src.nn.Linear import NoisyLinear
 
 
 class QmixAgentConfig(ConfigBase):
@@ -18,12 +19,33 @@ class QmixAgentConfig(ConfigBase):
                  buffer_conf=None):
         super(QmixAgentConfig, self).__init__(name=name, qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf,
                                               fit=fit_conf, buffer=buffer_conf)
-        self.qnet = MultiStepQnetConfig()
-        self.mixer = QmixNetworkConfig()
         self.brain = QmixBrainConfig()
-        self.fit = {'batch_size': 256,
-                    'hist_num_time_steps': 2}
+
+        self.qnet = MultiStepQnetConfig()
+        if self.brain.brain['use_noisy_q']:
+            self.qnet.qnet.move_module['use_noisy'] = True
+            self.qnet.qnet.attack_module['use_noisy'] = True
+            self.qnet['exploration_method'] = 'noisy_net'
+        else:
+            self.qnet.qnet.move_module['use_noisy'] = False
+            self.qnet.qnet.attack_module['use_noisy'] = False
+
+        if self.brain.brain['mixer_use_hidden']:
+            mixer_input_feat_dim = self.qnet.hist.hist_rnn['hidden_size'] + self.qnet.hist.curr_enc['output_node_dim']
+        else:
+            mixer_input_feat_dim = self.qnet.hist.curr_enc['input_node_dim']
+
+        self.mixer = QmixNetworkConfig()
+        # infer mixer module's input dims
+        self.mixer.submixer.b_net['input_dimension'] = mixer_input_feat_dim
+        self.mixer.submixer.w_net['input_node_dim'] = mixer_input_feat_dim
+        self.mixer.supmixer_gc['in_features'] = mixer_input_feat_dim
+        self.mixer.supmixer_mlp['input_dimension'] = mixer_input_feat_dim
+
+        self.fit = {'batch_size': 128,
+                    'hist_num_time_steps': 3}
         self.buffer = NstepMemoryConfig()
+        self.buffer.memory['N'] = self.fit['hist_num_time_steps']
 
 
 class QmixAgent(torch.nn.Module):
@@ -72,6 +94,16 @@ class QmixAgent(torch.nn.Module):
         curr_graph.ndata.pop('enemy_tag')
 
         return nn_actions, sc2_actions, info_dict
+
+    def sample_noise(self):
+        for m in self.modules():
+            if isinstance(m, NoisyLinear):
+                m.sample_noise()
+
+    def remove_noise(self):
+        for m in self.modules():
+            if isinstance(m, NoisyLinear):
+                m.remove_noise()
 
     def fit(self, device='cpu'):
         # the prefix 'c' indicates #current# time stamp inputs

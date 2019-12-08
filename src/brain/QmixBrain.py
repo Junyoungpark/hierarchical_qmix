@@ -14,16 +14,18 @@ class QmixBrainConfig(ConfigBase):
             'optimizer': 'lookahead',
             'lr': 1e-5,
             'gamma': 1.0,
-            'eps': 0.01,
+            'eps': 0.5,
             'eps_gamma': 0.995,
             'eps_min': 0.01,
             'use_double_q': True,
-            'use_clipped_q': False
+            'use_clipped_q': False,
+            'mixer_use_hidden': True,
+            'use_noisy_q': False
         }
 
         self.fit = {
-            'tau': 1.0,
-            'auto_norm_clip': False,
+            'tau': 0.1,
+            'auto_norm_clip': True,
             'auto_norm_clip_base_val': 0.1,
             'norm_clip_val': 1.0
         }
@@ -35,6 +37,7 @@ class QmixBrain(BrainBase):
         self.conf = conf
         self.brain_conf = conf.brain
         self.fit_conf = conf.fit
+        self.mixer_use_hidden = self.brain_conf['mixer_use_hidden']
 
         self.use_double_q = self.brain_conf['use_double_q']
         self.use_clipped_q = self.brain_conf['use_clipped_q']
@@ -84,19 +87,20 @@ class QmixBrain(BrainBase):
 
         return nn_actions, info_dict
 
-    @staticmethod
-    def _compute_qs(inputs: dict, qnet, mixer, actions=None):
+    def _compute_qs(self, inputs: dict, qnet, mixer, actions=None):
         q_dict = qnet.compute_qs(**inputs)
         qs = q_dict['qs']
         if actions is None:
             qs, _ = qs.max(dim=1)
         else:
             qs = qs.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
-        q_tot = mixer(inputs['curr_graph'], q_dict['hidden_feat'], qs)
+        if self.mixer_use_hidden:
+            q_tot = mixer(inputs['curr_graph'], q_dict['hidden_feat'], qs)
+        else:
+            q_tot = mixer(inputs['curr_graph'], inputs['curr_feature'], qs)
         return q_tot
 
-    @staticmethod
-    def _compute_double_qs(inputs: dict, target_qnet, target_mixer, action_qnet):
+    def _compute_double_qs(self, inputs: dict, target_qnet, target_mixer, action_qnet):
         action_q_dict = action_qnet.compute_qs(**inputs)
         action_q = action_q_dict['qs']
         actions = action_q.argmax(dim=1)
@@ -104,7 +108,10 @@ class QmixBrain(BrainBase):
         target_q_dict = target_qnet.compute_qs(**inputs)
         target_q = target_q_dict['qs']
         target_q = target_q.gather(-1, actions.unsqueeze(-1).long()).squeeze(dim=-1)
-        target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
+        if self.mixer_use_hidden:
+            target_q_tot = target_mixer(inputs['curr_graph'], target_q_dict['hidden_feat'], target_q)
+        else:
+            target_q_tot = target_mixer(inputs['curr_graph'], inputs['curr_feature'], target_q)
         return target_q_tot
 
     def fit(self, curr_inputs, next_inputs, actions, rewards, dones):

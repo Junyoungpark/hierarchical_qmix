@@ -3,6 +3,7 @@ import torch
 
 from src.nn.MLP import MLPConfig, MultiLayerPerceptron as MLP
 from src.nn.GraphConvolution import GraphConvolutionLayer
+from src.nn.GCN import GCN, GCNConfig
 from src.rl.Qmixer import Qmixer, QmixerConfig
 from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
@@ -13,12 +14,15 @@ class QmixNetworkConfig(ConfigBase):
         super(QmixNetworkConfig, self).__init__(name=name, submixer=submixer_conf, supmixer_gc=supmixer_gc_conf,
                                                 supmixer_mlp=supmixer_mlp_conf)
         self.submixer = QmixerConfig()
-        self.supmixer_gc = {'in_features': 51,
-                            'out_features': 1,
-                            'bias': True}
+        self.supmixer_gc = GCNConfig().gcn
+
+        nf_dim = 51
+
+        self.supmixer_gc['in_features'] = nf_dim
         self.supmixer_mlp = MLPConfig().mlp
-        self.supmixer_mlp['input_dimension'] = 51
+        self.supmixer_mlp['input_dimension'] = nf_dim
         self.supmixer_mlp['output_dimension'] = 1
+        self.supmixer_mlp['out_activation'] = None
 
 
 class QmixNetwork(torch.nn.Module):
@@ -30,8 +34,10 @@ class QmixNetwork(torch.nn.Module):
         self.supmixer_mlp_conf = conf.supmixer_mlp
 
         self.submixer = Qmixer(self.submixer_conf)
-        self.supmixer = GraphConvolutionLayer(**self.supmixer_gc_conf)
+        self.supmixer = GCN(**self.supmixer_gc_conf)
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
+
+        self.n_clusters = self.submixer_conf.mixer['num_clusters']
 
     def forward(self, graph, node_feature, qs):
         sub_q_ret_dict = self.submixer(graph, node_feature, qs)
@@ -46,7 +52,7 @@ class QmixNetwork(torch.nn.Module):
 
         adj_mats = []
         for w in ws.split(nums_ally):
-            adj_mat = w.t().mm(w)  # [#. clusters x #. clusters]
+            adj_mat = w.t().mm(w) + torch.eye(self.n_clusters, device=ws.device)  # [#. clusters x #. clusters]
             adj_mats.append(adj_mat)
         adj_mats = torch.stack(adj_mats)  # [#. graph x #. clusters x #. clusters]
         #### slow implementation ####

@@ -23,7 +23,9 @@ class QnetConfig(ConfigBase):
                      'exploration_method': 'eps_greedy'}
 
         self.move_module = mlp_conf
+        self.move_module['out_activation'] = None
         self.attack_module = mlp_conf
+        self.attack_module['out_activation'] = None
 
 
 class Qnet(nn.Module):

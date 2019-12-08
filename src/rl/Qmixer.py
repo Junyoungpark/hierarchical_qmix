@@ -17,10 +17,11 @@ class QmixerConfig(ConfigBase):
     def __init__(self, name='qmixer', mixer_conf=None, b_net_conf=None, w_net_conf=None):
         super(QmixerConfig, self).__init__(name=name, mixer=mixer_conf, b_net=b_net_conf, w_net=w_net_conf)
 
-        self.mixer = {'num_clusters': 3}
+        self.mixer = {'num_clusters': 4}
         self.b_net = MLPConfig().mlp
         self.b_net['input_dimension'] = 51
         self.b_net['output_dimension'] = self.mixer['num_clusters']
+        self.b_net['out_activation'] = None
 
         self.w_net = RGNConfig().gnn
         self.w_net['input_node_dim'] = 51

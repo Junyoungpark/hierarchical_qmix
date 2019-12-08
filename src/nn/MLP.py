@@ -12,12 +12,12 @@ class MLPConfig(ConfigBase):
             'input_dimension': 32,
             'output_dimension': 32,
             'activation': 'mish',
-            'out_activation': None,
+            'out_activation': 'mish',
             'num_neurons': [64, 64],
             'normalization': None,
             'weight_init': 'xavier',
             'dropout_probability': 0.0,
-            'use_noisy': False} if mlp_conf is None else mlp_conf
+            'use_noisy': False}
 
 
 class MultiLayerPerceptron(nn.Module):

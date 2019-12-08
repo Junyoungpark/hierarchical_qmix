@@ -16,7 +16,7 @@ class RunnerConfig(ConfigBase):
     def __init__(self, agent, name='runner', runner_conf=None, env_conf=None):
         super(RunnerConfig, self).__init__(name=name, runner=runner_conf, env=env_conf)
         self.env = {
-            "map_name": 'training_scenario_4',
+            "map_name": 'training_scenario_5',
             "reward_func": victory_if_zero_enemy,
             "state_proc_func": process_game_state_to_dgl,
             "frame_skip_rate": 2,

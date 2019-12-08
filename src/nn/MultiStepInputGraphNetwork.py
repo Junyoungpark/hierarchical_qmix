@@ -21,8 +21,8 @@ class MultiStepInputGraphNetworkConfig(ConfigBase):
 
         self.hist_rnn = {
             'rnn_type': 'GRU',
-            'input_size': 19,
-            'hidden_size': 32,
+            'input_size': 32,
+            'hidden_size': 64,
             'num_layers': 2,
             'batch_first': True}
 
