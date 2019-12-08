@@ -6,7 +6,7 @@ from src.agent.QmixAgent import QmixAgent, QmixAgentConfig
 
 if __name__ == '__main__':
 
-    exp_name = "qmix_refac"
+    exp_name = "Qmix_MLPSUP"
 
     conf = QmixAgentConfig()
     use_noisy_q = conf.brain.brain['use_noisy_q']
