@@ -17,10 +17,10 @@ class QmixBrainConfig(ConfigBase):
             'eps': 0.5,
             'eps_gamma': 0.995,
             'eps_min': 0.01,
-            'use_double_q': True,
+            'use_double_q': False,
             'use_clipped_q': True,
             'mixer_use_hidden': True,
-            'use_noisy_q': True
+            'use_noisy_q': False
         }
 
         self.fit = {
@@ -63,6 +63,9 @@ class QmixBrain(BrainBase):
 
         if self.use_target_q:
             self.update_target_network(1.0, self.qnet, self.qnet2)
+            self.update_target_network(1.0, self.mixer, self.mixer2)
+
+        if self.use_clipped_q:
             self.update_target_network(1.0, self.mixer, self.mixer2)
 
         # set base optimizer

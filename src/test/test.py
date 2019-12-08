@@ -6,7 +6,7 @@ from src.agent.QmixAgent import QmixAgent, QmixAgentConfig
 
 if __name__ == '__main__':
 
-    exp_name = "Qmix_MLPSUP"
+    exp_name = "qmix_refac"
 
     conf = QmixAgentConfig()
     use_noisy_q = conf.brain.brain['use_noisy_q']
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         running_wr = np.mean(running_wrs)
 
         fit_return_dict.update({'train_winning_ratio': running_wr, 'epsilon': agent.brain.eps})
-
+        print(fit_return_dict)
         wandb.log(fit_return_dict, step=iters)
 
         if use_noisy_q:
