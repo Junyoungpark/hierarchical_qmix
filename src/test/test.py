@@ -8,6 +8,10 @@ if __name__ == '__main__':
 
     exp_name = "qmix_refac"
 
+    # test variable
+    num_runners = 1
+    num_samples = 6
+
     conf = QmixAgentConfig()
     use_noisy_q = conf.brain.brain['use_noisy_q']
     gamma = conf.brain.brain['gamma']
@@ -17,7 +21,7 @@ if __name__ == '__main__':
         agent.sample_noise()
 
     runner_conf = RunnerConfig(agent=agent)
-    runner_conf.runner['num_runners'] = 1
+    runner_conf.runner['num_runners'] = num_runners
     runner_conf.runner['gamma'] = gamma
     runner_conf.runner['n_hist_steps'] = conf.fit['hist_num_time_steps']
     runner = RunnerManager(runner_conf)
@@ -29,7 +33,7 @@ if __name__ == '__main__':
     iters = 0
     while iters < 100:
         iters += 1
-        runner.sample(6)
+        runner.sample(num_samples)
         runner.transfer_sample()
 
         agent.to('cuda')
