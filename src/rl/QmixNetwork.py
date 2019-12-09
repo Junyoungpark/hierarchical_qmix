@@ -41,6 +41,8 @@ class QmixNetwork(torch.nn.Module):
         # self.supmixer = MLP(**self.supmixer_mlp_conf) # opt 2: MLP supmixer
         self.supmixer_b = MLP(**self.supmixer_mlp_conf)
 
+        self.use_softmax = True
+
         self.n_clusters = self.submixer_conf.mixer['num_clusters']
 
     def forward(self, graph, node_feature, qs):
@@ -76,7 +78,10 @@ class QmixNetwork(torch.nn.Module):
         # sup_ws = self.supmixer(aggregated_feat)
         # #### MLP Style ####
 
-        sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
+        if self.use_softmax:
+            sup_ws = torch.nn.functional.softmax(sup_ws, dim=1)
+        else:
+            pass
 
         sup_weighted_qs = sup_ws * aggregated_q.unsqueeze(dim=-1)  # [#. graph x #.cluster x 1]
         sup_qs = sup_weighted_qs.sum(dim=1)
