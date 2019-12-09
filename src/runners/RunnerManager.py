@@ -32,7 +32,7 @@ class RunnerConfig(ConfigBase):
 
         self.runner = {
             'num_runners': 1,
-            'n_hist_steps': 2,
+            'n_hist_steps': 3,
             'sample_spec': sample_spec,
             'gamma': 0.9
         }

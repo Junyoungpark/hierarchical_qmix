@@ -49,7 +49,7 @@ class LinearModule(nn.Module):
                  activation: 'str',
                  norm: 'str' = None,
                  dropout_p: 'float' = 0.0,
-                 weight_init: 'str' = 'xavier',
+                 weight_init: 'str' = None,
                  use_noisy: bool = False,
                  **linear_kwargs):
         super(LinearModule, self).__init__()

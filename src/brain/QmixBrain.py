@@ -26,7 +26,7 @@ class QmixBrainConfig(ConfigBase):
         self.fit = {
             'tau': 0.1,
             'auto_norm_clip': False,
-            'auto_norm_clip_base_val': 0.1,
+            'auto_norm_clip_base_val': 1.0,
             'norm_clip_val': None
         }
 
@@ -153,15 +153,13 @@ class QmixBrain(BrainBase):
 
         q_targets = rewards + self.gamma * next_q_tot * (1 - dones)
 
-        loss = torch.nn.functional.mse_loss(input=q_tot, target=q_targets)
-
         if self.fit_conf['auto_norm_clip']:
             norm_clip_val = self.fit_conf['auto_norm_clip_base_val'] * q_tot.shape[0]
         else:
             norm_clip_val = self.fit_conf['norm_clip_val']
 
+        loss = torch.nn.functional.mse_loss(input=q_tot, target=q_targets)
         params = list(self.qnet.parameters()) + list(self.mixer.parameters())
-
         self.clip_and_optimize(optimizer=self.qnet_optimizer,
                                params=params,
                                loss=loss,

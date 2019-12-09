@@ -1,0 +1,409 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.13
+    is_jupyter_run: false
+    python_version: 3.7.4
+multistepqnet multistepgnn curr_enc edge_types:
+  desc: null
+  value:
+  - 0
+  - 1
+  - 2
+multistepqnet multistepgnn curr_enc hidden_node_dim:
+  desc: null
+  value: 8
+multistepqnet multistepgnn curr_enc init_node_dim:
+  desc: null
+  value: 19
+multistepqnet multistepgnn curr_enc input_node_dim:
+  desc: null
+  value: 19
+multistepqnet multistepgnn curr_enc node_types:
+  desc: null
+  value:
+  - 0
+  - 1
+multistepqnet multistepgnn curr_enc num_hidden_layers:
+  desc: null
+  value: 1
+multistepqnet multistepgnn curr_enc output_node_dim:
+  desc: null
+  value: 32
+multistepqnet multistepgnn curr_enc updater_conf activation:
+  desc: null
+  value: mish
+multistepqnet multistepgnn curr_enc updater_conf dropout_probability:
+  desc: null
+  value: 0.0
+multistepqnet multistepgnn curr_enc updater_conf input_dimension:
+  desc: null
+  value: 32
+multistepqnet multistepgnn curr_enc updater_conf normalization:
+  desc: null
+  value: null
+multistepqnet multistepgnn curr_enc updater_conf num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+multistepqnet multistepgnn curr_enc updater_conf out_activation:
+  desc: null
+  value: mish
+multistepqnet multistepgnn curr_enc updater_conf output_dimension:
+  desc: null
+  value: 32
+multistepqnet multistepgnn curr_enc updater_conf use_noisy:
+  desc: null
+  value: false
+multistepqnet multistepgnn curr_enc updater_conf weight_init:
+  desc: null
+  value: xavier
+multistepqnet multistepgnn curr_enc use_concat:
+  desc: null
+  value: true
+multistepqnet multistepgnn curr_enc use_residual:
+  desc: null
+  value: false
+multistepqnet multistepgnn hist_enc edge_types:
+  desc: null
+  value:
+  - 0
+  - 1
+  - 2
+multistepqnet multistepgnn hist_enc hidden_node_dim:
+  desc: null
+  value: 8
+multistepqnet multistepgnn hist_enc init_node_dim:
+  desc: null
+  value: 19
+multistepqnet multistepgnn hist_enc input_node_dim:
+  desc: null
+  value: 19
+multistepqnet multistepgnn hist_enc node_types:
+  desc: null
+  value:
+  - 0
+  - 1
+multistepqnet multistepgnn hist_enc num_hidden_layers:
+  desc: null
+  value: 1
+multistepqnet multistepgnn hist_enc output_node_dim:
+  desc: null
+  value: 32
+multistepqnet multistepgnn hist_enc updater_conf activation:
+  desc: null
+  value: mish
+multistepqnet multistepgnn hist_enc updater_conf dropout_probability:
+  desc: null
+  value: 0.0
+multistepqnet multistepgnn hist_enc updater_conf input_dimension:
+  desc: null
+  value: 32
+multistepqnet multistepgnn hist_enc updater_conf normalization:
+  desc: null
+  value: null
+multistepqnet multistepgnn hist_enc updater_conf num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+multistepqnet multistepgnn hist_enc updater_conf out_activation:
+  desc: null
+  value: mish
+multistepqnet multistepgnn hist_enc updater_conf output_dimension:
+  desc: null
+  value: 32
+multistepqnet multistepgnn hist_enc updater_conf use_noisy:
+  desc: null
+  value: false
+multistepqnet multistepgnn hist_enc updater_conf weight_init:
+  desc: null
+  value: xavier
+multistepqnet multistepgnn hist_enc use_concat:
+  desc: null
+  value: true
+multistepqnet multistepgnn hist_enc use_residual:
+  desc: null
+  value: false
+multistepqnet multistepgnn hist_rnn batch_first:
+  desc: null
+  value: true
+multistepqnet multistepgnn hist_rnn hidden_size:
+  desc: null
+  value: 64
+multistepqnet multistepgnn hist_rnn input_size:
+  desc: null
+  value: 32
+multistepqnet multistepgnn hist_rnn num_layers:
+  desc: null
+  value: 2
+multistepqnet multistepgnn hist_rnn rnn_type:
+  desc: null
+  value: GRU
+multistepqnet qnet attack_module activation:
+  desc: null
+  value: mish
+multistepqnet qnet attack_module dropout_probability:
+  desc: null
+  value: 0.0
+multistepqnet qnet attack_module input_dimension:
+  desc: null
+  value: 32
+multistepqnet qnet attack_module normalization:
+  desc: null
+  value: layer
+multistepqnet qnet attack_module num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+multistepqnet qnet attack_module out_activation:
+  desc: null
+  value: null
+multistepqnet qnet attack_module output_dimension:
+  desc: null
+  value: 32
+multistepqnet qnet attack_module use_noisy:
+  desc: null
+  value: true
+multistepqnet qnet attack_module weight_init:
+  desc: null
+  value: xavier
+multistepqnet qnet move_module activation:
+  desc: null
+  value: mish
+multistepqnet qnet move_module dropout_probability:
+  desc: null
+  value: 0.0
+multistepqnet qnet move_module input_dimension:
+  desc: null
+  value: 32
+multistepqnet qnet move_module normalization:
+  desc: null
+  value: layer
+multistepqnet qnet move_module num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+multistepqnet qnet move_module out_activation:
+  desc: null
+  value: null
+multistepqnet qnet move_module output_dimension:
+  desc: null
+  value: 32
+multistepqnet qnet move_module use_noisy:
+  desc: null
+  value: true
+multistepqnet qnet move_module weight_init:
+  desc: null
+  value: xavier
+multistepqnet qnet qnet ally_node_type_index:
+  desc: null
+  value: 0
+multistepqnet qnet qnet attack_edge_type_index:
+  desc: null
+  value: 1
+multistepqnet qnet qnet exploration_method:
+  desc: null
+  value: clustered_random
+qmixagnet fit batch_size:
+  desc: null
+  value: 128
+qmixagnet fit hist_num_time_steps:
+  desc: null
+  value: 3
+qmixagnet nstepmemory memory N:
+  desc: null
+  value: 3
+qmixagnet nstepmemory memory gamma:
+  desc: null
+  value: 0.9
+qmixagnet nstepmemory memory max_n_episodes:
+  desc: null
+  value: 3000
+qmixagnet nstepmemory memory max_traj_len:
+  desc: null
+  value: 30
+qmixagnet nstepmemory memory use_return:
+  desc: null
+  value: true
+qmixagnet qmixbrain brain eps:
+  desc: null
+  value: 0.5
+qmixagnet qmixbrain brain eps_gamma:
+  desc: null
+  value: 0.995
+qmixagnet qmixbrain brain eps_min:
+  desc: null
+  value: 0.01
+qmixagnet qmixbrain brain gamma:
+  desc: null
+  value: 1.0
+qmixagnet qmixbrain brain lr:
+  desc: null
+  value: 1.0e-05
+qmixagnet qmixbrain brain mixer_use_hidden:
+  desc: null
+  value: true
+qmixagnet qmixbrain brain optimizer:
+  desc: null
+  value: lookahead
+qmixagnet qmixbrain brain use_clipped_q:
+  desc: null
+  value: true
+qmixagnet qmixbrain brain use_double_q:
+  desc: null
+  value: true
+qmixagnet qmixbrain brain use_noisy_q:
+  desc: null
+  value: true
+qmixagnet qmixbrain fit auto_norm_clip:
+  desc: null
+  value: true
+qmixagnet qmixbrain fit auto_norm_clip_base_val:
+  desc: null
+  value: 0.1
+qmixagnet qmixbrain fit norm_clip_val:
+  desc: null
+  value: 1.0
+qmixagnet qmixbrain fit tau:
+  desc: null
+  value: 0.1
+qmixagnet qmixnetwork supmixer_gc hidden_act:
+  desc: null
+  value: mish
+qmixagnet qmixnetwork supmixer_gc hidden_features:
+  desc: null
+  value: 64
+qmixagnet qmixnetwork supmixer_gc in_features:
+  desc: null
+  value: 96
+qmixagnet qmixnetwork supmixer_gc num_hidden_layers:
+  desc: null
+  value: 2
+qmixagnet qmixnetwork supmixer_gc out_features:
+  desc: null
+  value: 1
+qmixagnet qmixnetwork supmixer_mlp activation:
+  desc: null
+  value: mish
+qmixagnet qmixnetwork supmixer_mlp dropout_probability:
+  desc: null
+  value: 0.0
+qmixagnet qmixnetwork supmixer_mlp input_dimension:
+  desc: null
+  value: 96
+qmixagnet qmixnetwork supmixer_mlp normalization:
+  desc: null
+  value: null
+qmixagnet qmixnetwork supmixer_mlp num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+qmixagnet qmixnetwork supmixer_mlp out_activation:
+  desc: null
+  value: null
+qmixagnet qmixnetwork supmixer_mlp output_dimension:
+  desc: null
+  value: 1
+qmixagnet qmixnetwork supmixer_mlp use_noisy:
+  desc: null
+  value: false
+qmixagnet qmixnetwork supmixer_mlp weight_init:
+  desc: null
+  value: xavier
+qmixnetwork qmixer b_net activation:
+  desc: null
+  value: mish
+qmixnetwork qmixer b_net dropout_probability:
+  desc: null
+  value: 0.0
+qmixnetwork qmixer b_net input_dimension:
+  desc: null
+  value: 96
+qmixnetwork qmixer b_net normalization:
+  desc: null
+  value: null
+qmixnetwork qmixer b_net num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+qmixnetwork qmixer b_net out_activation:
+  desc: null
+  value: null
+qmixnetwork qmixer b_net output_dimension:
+  desc: null
+  value: 4
+qmixnetwork qmixer b_net use_noisy:
+  desc: null
+  value: false
+qmixnetwork qmixer b_net weight_init:
+  desc: null
+  value: xavier
+qmixnetwork qmixer mixer num_clusters:
+  desc: null
+  value: 4
+qmixnetwork qmixer w_net edge_types:
+  desc: null
+  value:
+  - 0
+qmixnetwork qmixer w_net hidden_node_dim:
+  desc: null
+  value: 8
+qmixnetwork qmixer w_net init_node_dim:
+  desc: null
+  value: 19
+qmixnetwork qmixer w_net input_node_dim:
+  desc: null
+  value: 96
+qmixnetwork qmixer w_net node_types:
+  desc: null
+  value:
+  - 0
+qmixnetwork qmixer w_net num_hidden_layers:
+  desc: null
+  value: 1
+qmixnetwork qmixer w_net output_node_dim:
+  desc: null
+  value: 4
+qmixnetwork qmixer w_net updater_conf activation:
+  desc: null
+  value: mish
+qmixnetwork qmixer w_net updater_conf dropout_probability:
+  desc: null
+  value: 0.0
+qmixnetwork qmixer w_net updater_conf input_dimension:
+  desc: null
+  value: 32
+qmixnetwork qmixer w_net updater_conf normalization:
+  desc: null
+  value: null
+qmixnetwork qmixer w_net updater_conf num_neurons:
+  desc: null
+  value:
+  - 64
+  - 64
+qmixnetwork qmixer w_net updater_conf out_activation:
+  desc: null
+  value: mish
+qmixnetwork qmixer w_net updater_conf output_dimension:
+  desc: null
+  value: 32
+qmixnetwork qmixer w_net updater_conf use_noisy:
+  desc: null
+  value: false
+qmixnetwork qmixer w_net updater_conf weight_init:
+  desc: null
+  value: xavier
+qmixnetwork qmixer w_net use_concat:
+  desc: null
+  value: true
+qmixnetwork qmixer w_net use_residual:
+  desc: null
+  value: false

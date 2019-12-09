@@ -1,0 +1,10 @@
+{"loss": 218.39793395996094, "loss2": 147.68368530273438, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 48.32772254943848, "_timestamp": 1575806058.8457954, "_step": 1}
+{"loss": 195.94920349121094, "loss2": 88.63923645019531, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 59.39010715484619, "_timestamp": 1575806069.90818, "_step": 2}
+{"loss": 206.39015197753906, "loss2": 95.57606506347656, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 70.32248330116272, "_timestamp": 1575806080.8405561, "_step": 3}
+{"loss": 238.17904663085938, "loss2": 121.30590057373047, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 80.66748642921448, "_timestamp": 1575806091.1855593, "_step": 4}
+{"loss": 267.7979736328125, "loss2": 109.3210678100586, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 91.50828099250793, "_timestamp": 1575806102.0263538, "_step": 5}
+{"loss": 291.57330322265625, "loss2": 104.55463409423828, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 102.71419072151184, "_timestamp": 1575806113.2322636, "_step": 6}
+{"loss": 235.09754943847656, "loss2": 66.5058822631836, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 112.90330791473389, "_timestamp": 1575806123.4213808, "_step": 7}
+{"loss": 202.90240478515625, "loss2": 82.5705795288086, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 123.45488166809082, "_timestamp": 1575806133.9729545, "_step": 8}
+{"loss": 195.29112243652344, "loss2": 98.1681137084961, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 134.03754472732544, "_timestamp": 1575806144.5556176, "_step": 9}
+{"loss": 196.09242248535156, "loss2": 59.62297058105469, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 144.927170753479, "_timestamp": 1575806155.4452436, "_step": 10}

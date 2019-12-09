@@ -25,10 +25,11 @@ class QmixAgentConfig(ConfigBase):
         if self.brain.brain['use_noisy_q']:
             self.qnet.qnet.move_module['use_noisy'] = True
             self.qnet.qnet.attack_module['use_noisy'] = True
-            self.qnet.qnet.qnet['exploration_method'] = 'clustered_random'
+            self.qnet.qnet.qnet['exploration_method'] = 'noisy_net'
         else:
             self.qnet.qnet.move_module['use_noisy'] = False
             self.qnet.qnet.attack_module['use_noisy'] = False
+            self.qnet.qnet.qnet['exploration_method'] = 'clustered_random'
 
         if self.brain.brain['mixer_use_hidden']:
             mixer_input_feat_dim = self.qnet.hist.hist_rnn['hidden_size'] + self.qnet.hist.curr_enc['output_node_dim']

@@ -1,0 +1,9 @@
+{
+    "train_winning_ratio": 0.0,
+    "_timestamp": 1575808322.7775915,
+    "epsilon": 0.5,
+    "loss": Infinity,
+    "_runtime": 42.90843486785889,
+    "loss2": 3.4312251822431554e+23,
+    "_step": 1
+}

@@ -10,6 +10,7 @@ from src.config.ConfigBase import ConfigBase
 
 from src.util.graph_util import get_filtered_node_index_by_type
 from src.config.graph_config import NODE_ALLY, NODE_ENEMY, EDGE_ALLY, EDGE_ALLY_TO_ENEMY, EDGE_ENEMY
+from src.config.nn_config import VERY_SMALL_NUMBER
 
 
 class QmixerConfig(ConfigBase):
@@ -17,7 +18,7 @@ class QmixerConfig(ConfigBase):
     def __init__(self, name='qmixer', mixer_conf=None, b_net_conf=None, w_net_conf=None):
         super(QmixerConfig, self).__init__(name=name, mixer=mixer_conf, b_net=b_net_conf, w_net=w_net_conf)
 
-        self.mixer = {'num_clusters': 4}
+        self.mixer = {'num_clusters': 4, 'use_clipped_score': False}
         self.b_net = MLPConfig().mlp
         self.b_net['input_dimension'] = 51
         self.b_net['output_dimension'] = self.mixer['num_clusters']
@@ -36,7 +37,6 @@ class Qmixer(nn.Module):
     def __init__(self, conf):
         super(Qmixer, self).__init__()
 
-        self.conf = conf
         self.num_clusters = conf.mixer['num_clusters']
 
         b_net_conf = conf.b_net
@@ -44,11 +44,15 @@ class Qmixer(nn.Module):
 
         self.q_b_net = MLP(**b_net_conf)
         self.w_net = RelationalGraphNetwork(**w_net_conf)
+        self.use_clipped_score = conf.mixer['use_clipped_score']
 
     def get_w(self, graph, node_feature):
         ws = self.w_net(graph, node_feature)  # [#. allies x #. clusters]
         ally_indices = get_filtered_node_index_by_type(graph, NODE_ALLY)
         ally_ws = ws[ally_indices, :]  # [#. allies x #. clusters]
+        if self.use_clipped_score:
+            ally_ws = ally_ws.clamp(min=VERY_SMALL_NUMBER, max=10)
+
         ally_ws = torch.nn.functional.softmax(ally_ws, dim=1)
         return ally_ws
 

@@ -1,0 +1,42 @@
+diff --git a/src/agent/QmixAgent.py b/src/agent/QmixAgent.py
+index 3f8e2fb..6dce25c 100644
+--- a/src/agent/QmixAgent.py
++++ b/src/agent/QmixAgent.py
+@@ -25,7 +25,7 @@ class QmixAgentConfig(ConfigBase):
+         if self.brain.brain['use_noisy_q']:
+             self.qnet.qnet.move_module['use_noisy'] = True
+             self.qnet.qnet.attack_module['use_noisy'] = True
+-            self.qnet['exploration_method'] = 'noisy_net'
++            self.qnet.qnet.qnet['exploration_method'] = 'noisy_net'
+         else:
+             self.qnet.qnet.move_module['use_noisy'] = False
+             self.qnet.qnet.attack_module['use_noisy'] = False
+diff --git a/src/brain/QmixBrain.py b/src/brain/QmixBrain.py
+index 0ff0244..a40b99b 100644
+--- a/src/brain/QmixBrain.py
++++ b/src/brain/QmixBrain.py
+@@ -20,7 +20,7 @@ class QmixBrainConfig(ConfigBase):
+             'use_double_q': True,
+             'use_clipped_q': False,
+             'mixer_use_hidden': True,
+-            'use_noisy_q': False
++            'use_noisy_q': True
+         }
+ 
+         self.fit = {
+diff --git a/src/nn/Linear.py b/src/nn/Linear.py
+index c3f7ec5..bee37bd 100644
+--- a/src/nn/Linear.py
++++ b/src/nn/Linear.py
+@@ -21,8 +21,9 @@ class NoisyLinear(nn.Linear):
+         self.reset_parameters()
+ 
+     def reset_parameters(self):
+-        torch.nn.init.constant_(self.sigma_weight, self.sigma_init)
+-        torch.nn.init.constant_(self.sigma_bias, self.sigma_init)
++        if hasattr(self, 'sigma_weight'):  # Only init after all params added (otherwise super().__init__() fails)
++            torch.nn.init.constant_(self.sigma_weight, self.sigma_init)
++            torch.nn.init.constant_(self.sigma_bias, self.sigma_init)
+ 
+     def forward(self, x):
+         return F.linear(x, self.weight + self.sigma_weight * self.epsilon_weight,

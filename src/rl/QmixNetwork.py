@@ -8,6 +8,8 @@ from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 from src.util.train_util import dn
 
+TEST = True
+
 
 class QmixNetworkConfig(ConfigBase):
     def __init__(self, name='qmixnetwork', submixer_conf=None, supmixer_gc_conf=None, supmixer_mlp_conf=None,
@@ -58,6 +60,12 @@ class QmixNetwork(torch.nn.Module):
         aggregated_feat = sub_q_ret_dict['feat']  # [#. graph x num_cluster x feature_dim]
         aggregated_q = sub_q_ret_dict['qs']  # [#. graph x #.cluster]
         ws = sub_q_ret_dict['ws']  # [#. allies x #. clusters]
+
+        if TEST:
+            num_agent_per_clusters = torch.zeros_like(ws)
+            num_agent_per_clusters.scatter_(1, ws.argmax(dim=1).view(-1, 1), 1)
+            print(num_agent_per_clusters.sum(dim=0))
+            print(ws.mean(dim=0))
 
         graphs = dgl.unbatch(graph)
         nums_ally = get_number_of_ally_nodes(graphs)

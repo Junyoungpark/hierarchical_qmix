@@ -1,0 +1,26 @@
+diff --git a/src/brain/QmixBrain.py b/src/brain/QmixBrain.py
+index 079a05d..3c03323 100644
+--- a/src/brain/QmixBrain.py
++++ b/src/brain/QmixBrain.py
+@@ -25,9 +25,9 @@ class QmixBrainConfig(ConfigBase):
+ 
+         self.fit = {
+             'tau': 0.1,
+-            'auto_norm_clip': True,
++            'auto_norm_clip': False,
+             'auto_norm_clip_base_val': 0.1,
+-            'norm_clip_val': 1.0
++            'norm_clip_val': None
+         }
+ 
+ 
+@@ -184,4 +184,9 @@ class QmixBrain(BrainBase):
+             self.update_target_network(self.fit_conf['tau'], self.qnet, self.qnet2)
+             self.update_target_network(self.fit_conf['tau'], self.mixer, self.mixer2)
+ 
++        # decay epsilon
++        self.eps = self.eps * self.eps_gamma
++        if self.eps <= self.eps_min:
++            self.eps.fill_(self.eps_min.data[0])
++
+         return fit_dict
