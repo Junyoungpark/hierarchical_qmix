@@ -5,18 +5,22 @@ import numpy as np
 
 from src.runners.RunnerManager import RunnerConfig, RunnerManager
 from src.agent.QmixAgent import QmixAgent, QmixAgentConfig
+from src.rl.QmixNetwork import QmixerConfig
 
 if __name__ == '__main__':
 
-    exp_name = "qmix_refac"
+    exp_name = "DEBUG"
 
     # test variable
-    num_runners = 1
-    num_samples = 6
+    num_runners = 2
+    num_samples = 10
+    use_gcn = True
+    rectifier = 'softplus'
 
     conf = QmixAgentConfig()
     use_noisy_q = conf.brain.brain['use_noisy_q']
     gamma = conf.brain.brain['gamma']
+    conf.mixer.qmix = {'recifier': rectifier, 'use_gcn': use_gcn}
 
     agent = QmixAgent(conf)
     if use_noisy_q:
@@ -33,7 +37,7 @@ if __name__ == '__main__':
     wandb.config.update(conf())
 
     iters = 0
-    while iters < 100:
+    while iters < 1000:
         iters += 1
         runner.sample(num_samples)
         runner.transfer_sample()
