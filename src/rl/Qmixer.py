@@ -18,7 +18,7 @@ class QmixerConfig(ConfigBase):
     def __init__(self, name='qmixer', mixer_conf=None, b_net_conf=None, w_net_conf=None):
         super(QmixerConfig, self).__init__(name=name, mixer=mixer_conf, b_net=b_net_conf, w_net=w_net_conf)
 
-        self.mixer = {'num_clusters': 4, 'use_clipped_score': False}
+        self.mixer = {'num_clusters': 4, 'use_clipped_score': True}
         self.b_net = MLPConfig().mlp
         self.b_net['input_dimension'] = 51
         self.b_net['output_dimension'] = self.mixer['num_clusters']
