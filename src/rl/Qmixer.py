@@ -29,7 +29,7 @@ class QmixerConfig(ConfigBase):
         self.w_net['output_node_dim'] = self.mixer['num_clusters']
         self.w_net['num_hidden_layers'] = 0
         self.w_net['node_types'] = [NODE_ALLY]
-        self.w_net['edge_types'] = [EDGE_ALLY]
+        self.w_net['edge_types'] = [EDGE_ALLY, EDGE_ENEMY]
 
 
 class Qmixer(nn.Module):
