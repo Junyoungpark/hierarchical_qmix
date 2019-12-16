@@ -8,7 +8,7 @@ from src.config.ConfigBase import ConfigBase
 from src.util.graph_util import get_number_of_ally_nodes
 from src.util.train_util import dn
 
-TEST = True
+TEST = False
 
 
 class QmixNetworkConfig(ConfigBase):

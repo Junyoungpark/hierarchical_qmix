@@ -1,3 +1,0 @@
-{"loss": 47.65169906616211, "loss2": Infinity, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 75.30342435836792, "_timestamp": 1575805593.2299426, "_step": 1}
-{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.0, "epsilon": 0.5, "_runtime": 98.72055506706238, "_timestamp": 1575805616.6470733, "_step": 2}
-{"loss": NaN, "loss2": NaN, "train_winning_ratio": 0.06561000000000002, "epsilon": 0.5, "_runtime": 114.89901947975159, "_timestamp": 1575805632.8255377, "_step": 3}

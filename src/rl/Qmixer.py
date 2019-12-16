@@ -77,9 +77,16 @@ class Qmixer(nn.Module):
 
         graph.ndata['weighted_feat'] = _wf
         weighted_feat = dgl.sum_nodes(graph, 'weighted_feat')  # [#. graph x feature dim x #. clusters]
+        wf = weighted_feat.transpose(2, 1)  # [#. graph x num_cluster x feature_dim]
+
+        _nf = node_feature.unsqueeze(-1)
+        group_scalar = (_nf * _wf).sum(1)  # [#. nodes x # clusters]
+        group_scalar_ally = group_scalar[ally_indices, :]
+        group_scalar_ally = group_scalar_ally / group_scalar_ally.sum(1).unsqueeze(-1)  # [#. alllies x # clusters]
+
         _ = graph.ndata.pop('weighted_feat')
 
-        return weighted_feat.transpose(2, 1)  # [#. graph x num_cluster x feature_dim]
+        return wf, group_scalar_ally
 
     def get_q(self, graph, node_feature, qs, ws=None):
         device = node_feature.device
@@ -110,13 +117,14 @@ class Qmixer(nn.Module):
 
     def forward(self, graph, node_feature, qs):
         ws = self.get_w(graph, node_feature)
-        aggregated_feat = self.get_feat(graph, node_feature, ws)
+        aggregated_feat, group_scalar = self.get_feat(graph, node_feature, ws)
         aggregated_q = self.get_q(graph, node_feature, qs)
 
         ret_dict = dict()
         ret_dict['qs'] = aggregated_q
         ret_dict['ws'] = ws
         ret_dict['feat'] = aggregated_feat
+        # ret_dict['group_scalar'] = group_scalar
         return ret_dict
 
 
