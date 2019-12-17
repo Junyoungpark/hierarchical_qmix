@@ -21,7 +21,7 @@ class QmixBrainConfig(ConfigBase):
             'use_clipped_q': True,
             'mixer_use_hidden': True,
             'use_noisy_q': False,
-            'use_cluster_feat_q': True,
+            'use_cluster_feat_q': False,
         }
 
         self.fit = {
