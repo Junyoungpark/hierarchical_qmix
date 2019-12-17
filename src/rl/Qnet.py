@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -24,11 +26,11 @@ class QnetConfig(ConfigBase):
                      'ally_node_type_index': NODE_ALLY,
                      'exploration_method': 'eps_greedy'}
 
-        self.move_module = mlp_conf
+        self.move_module = deepcopy(mlp_conf)
         self.move_module['normalization'] = 'layer'
         self.move_module['out_activation'] = None
 
-        self.attack_module = mlp_conf
+        self.attack_module = deepcopy(mlp_conf)
         self.attack_module['normalization'] = 'layer'
         self.attack_module['out_activation'] = None
 

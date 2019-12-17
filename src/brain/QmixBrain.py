@@ -20,7 +20,8 @@ class QmixBrainConfig(ConfigBase):
             'use_double_q': False,
             'use_clipped_q': True,
             'mixer_use_hidden': True,
-            'use_noisy_q': False
+            'use_noisy_q': False,
+            'use_cluster_feat_q': True,
         }
 
         self.fit = {
@@ -46,6 +47,7 @@ class QmixBrain(BrainBase):
         self.register_buffer('eps', torch.ones(1, ) * self.brain_conf['eps'])
         self.register_buffer('eps_min', torch.ones(1, ) * self.brain_conf['eps_min'])
         self.eps_gamma = self.brain_conf['eps_gamma']
+        self.use_cluster_feat_q = self.brain_conf['use_cluster_feat_q']
 
         if int(self.use_double_q) + int(self.use_clipped_q) >= 2:
             warnings.warn("Either one of 'use_double_q' or 'clipped_q' can be true. 'use_double_q' set to be false.")
@@ -83,14 +85,29 @@ class QmixBrain(BrainBase):
 
         if use_q1:
             qnet = self.qnet
+            if self.use_cluster_feat_q:
+                mixer = self.mixer
+            else:
+                mixer = None
         else:
             qnet = self.qnet2
+            if self.use_cluster_feat_q:
+                mixer = self.mixer2
+            else:
+                mixer = None
+
+        inputs.update({'mixer': mixer})
 
         nn_actions, info_dict = qnet.get_action(**inputs)
 
         return nn_actions, info_dict
 
     def _compute_qs(self, inputs: dict, qnet, mixer, actions=None):
+        if self.use_cluster_feat_q:
+            inputs.update({'mixer': mixer})
+        else:
+            inputs.update({'mixer': None})
+
         q_dict = qnet.compute_qs(**inputs)
         qs = q_dict['qs']
         if actions is None:
@@ -104,6 +121,11 @@ class QmixBrain(BrainBase):
         return q_tot
 
     def _compute_double_qs(self, inputs: dict, target_qnet, target_mixer, action_qnet):
+        if self.use_cluster_feat_q:
+            inputs.update({'mixer': target_mixer})
+        else:
+            inputs.update({'mixer': None})
+
         action_q_dict = action_qnet.compute_qs(**inputs)
         action_q = action_q_dict['qs']
         actions = action_q.argmax(dim=1)

@@ -20,19 +20,11 @@ class QmixAgentConfig(ConfigBase):
         super(QmixAgentConfig, self).__init__(name=name, qnet=qnet_conf, mixer=mixer_conf, brain=brain_conf,
                                               fit=fit_conf, buffer=buffer_conf)
         self.brain = QmixBrainConfig()
-
         self.qnet = MultiStepQnetConfig()
-        if self.brain.brain['use_noisy_q']:
-            self.qnet.qnet.move_module['use_noisy'] = True
-            self.qnet.qnet.attack_module['use_noisy'] = True
-            self.qnet.qnet.qnet['exploration_method'] = 'noisy_net'
-        else:
-            self.qnet.qnet.move_module['use_noisy'] = False
-            self.qnet.qnet.attack_module['use_noisy'] = False
-            self.qnet.qnet.qnet['exploration_method'] = 'clustered_random'
 
+        enc_out_dim = self.qnet.hist.hist_rnn['hidden_size'] + self.qnet.hist.curr_enc['output_node_dim']
         if self.brain.brain['mixer_use_hidden']:
-            mixer_input_feat_dim = self.qnet.hist.hist_rnn['hidden_size'] + self.qnet.hist.curr_enc['output_node_dim']
+            mixer_input_feat_dim = enc_out_dim
         else:
             mixer_input_feat_dim = self.qnet.hist.curr_enc['input_node_dim']
 
@@ -42,6 +34,23 @@ class QmixAgentConfig(ConfigBase):
         self.mixer.submixer.w_net['input_node_dim'] = mixer_input_feat_dim
         self.mixer.supmixer_gc['in_features'] = mixer_input_feat_dim
         self.mixer.supmixer_mlp['input_dimension'] = mixer_input_feat_dim
+
+        if self.brain.brain['use_noisy_q']:
+            self.qnet.qnet.move_module['use_noisy'] = True
+            self.qnet.qnet.attack_module['use_noisy'] = True
+            self.qnet.qnet.qnet['exploration_method'] = 'noisy_net'
+        else:
+            self.qnet.qnet.move_module['use_noisy'] = False
+            self.qnet.qnet.attack_module['use_noisy'] = False
+            self.qnet.qnet.qnet['exploration_method'] = 'clustered_random'
+
+        if self.brain.brain['use_cluster_feat_q']:
+            num_clusters = self.mixer.submixer.mixer['num_clusters']
+            self.qnet.qnet.move_module['input_dimension'] = enc_out_dim + num_clusters
+            self.qnet.qnet.attack_module['input_dimension'] = 2 * (enc_out_dim + num_clusters)
+        else:
+            self.qnet.qnet.move_module['input_dimension'] = enc_out_dim
+            self.qnet.qnet.attack_module['input_dimension'] = 2 * enc_out_dim
 
         self.fit = {'batch_size': 128,
                     'hist_num_time_steps': 3}
