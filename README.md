@@ -11,6 +11,7 @@ The major contribution of this project is as follows:
 * numpy
 * DGL (Deep graph library)
 * python-sc2 (supports <= 0.11.1 __python-sc2 is now DEPRECIATED__)
+* wandb (a web based interactive logger)
 
 ## Simple Run with test code
 You can run the test code with the following code
