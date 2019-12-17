@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     # test variable
     num_runners = 1
-    num_samples = 10
+    num_samples = 3
     use_gcn = True
     rectifier = 'softplus'
     use_clipped_score = True

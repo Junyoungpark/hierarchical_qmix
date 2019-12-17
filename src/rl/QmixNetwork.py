@@ -60,6 +60,7 @@ class QmixNetwork(torch.nn.Module):
         aggregated_feat = sub_q_ret_dict['feat']  # [#. graph x num_cluster x feature_dim]
         aggregated_q = sub_q_ret_dict['qs']  # [#. graph x #.cluster]
         ws = sub_q_ret_dict['ws']  # [#. allies x #. clusters]
+        normed_group_dot_prod = sub_q_ret_dict['normed_group_dot_prod']
 
         if TEST:
             num_agent_per_clusters = torch.zeros_like(ws)

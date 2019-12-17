@@ -8,7 +8,7 @@ from src.nn.RelationalGraphNetwork import RelationalGraphNetworkConfig as RGNCon
 
 from src.config.ConfigBase import ConfigBase
 
-from src.util.graph_util import get_filtered_node_index_by_type
+from src.util.graph_util import get_filtered_node_index_by_type, get_number_of_ally_nodes
 from src.config.graph_config import NODE_ALLY, NODE_ENEMY, EDGE_ALLY, EDGE_ALLY_TO_ENEMY, EDGE_ENEMY
 from src.config.nn_config import VERY_SMALL_NUMBER
 
@@ -78,15 +78,27 @@ class Qmixer(nn.Module):
         graph.ndata['weighted_feat'] = _wf
         weighted_feat = dgl.sum_nodes(graph, 'weighted_feat')  # [#. graph x feature dim x #. clusters]
         wf = weighted_feat.transpose(2, 1)  # [#. graph x num_cluster x feature_dim]
+        _nf = node_feature.unsqueeze(-1)  # [# nodes x # features x 1]
 
-        _nf = node_feature.unsqueeze(-1)
-        group_scalar = (_nf * _wf).sum(1)  # [#. nodes x # clusters]
-        group_scalar_ally = group_scalar[ally_indices, :]
-        group_scalar_ally = group_scalar_ally / group_scalar_ally.sum(1).unsqueeze(-1)  # [#. alllies x # clusters]
+        # compute group-wise compatibility scores
+
+        num_ally_nodes = get_number_of_ally_nodes(dgl.unbatch(graph))
+        repeat_wf = torch.repeat_interleave(wf,
+                                            torch.tensor(num_ally_nodes, device=node_feature.device),
+                                            dim=0)  # [# allies x # clusters x feature_dim]
+
+        ally_nf_expanded = node_feature[ally_indices, :].unsqueeze(-1)  # [# allies x feature_dim x 1]
+
+        group_dot_prd = (ally_nf_expanded * repeat_wf.transpose(2, 1)).sum(1)  # [ # allies x # clusters ]
+
+        nf_norm_allies = torch.norm(_nf[ally_indices, :], dim=1)  # [# allies x 1]
+        wf_norm = torch.norm(repeat_wf, dim=2)  # [# allies x # clusters ]
+
+        normed_group_dot_prd = group_dot_prd / (nf_norm_allies * wf_norm)  # [# allies x # clusters]
 
         _ = graph.ndata.pop('weighted_feat')
 
-        return wf, group_scalar_ally
+        return wf, normed_group_dot_prd
 
     def get_q(self, graph, node_feature, qs, ws=None):
         device = node_feature.device
@@ -117,14 +129,14 @@ class Qmixer(nn.Module):
 
     def forward(self, graph, node_feature, qs):
         ws = self.get_w(graph, node_feature)
-        aggregated_feat, group_scalar = self.get_feat(graph, node_feature, ws)
+        aggregated_feat, normed_group_dot_prd = self.get_feat(graph, node_feature, ws)
         aggregated_q = self.get_q(graph, node_feature, qs)
 
         ret_dict = dict()
         ret_dict['qs'] = aggregated_q
         ret_dict['ws'] = ws
         ret_dict['feat'] = aggregated_feat
-        # ret_dict['group_scalar'] = group_scalar
+        ret_dict['normed_group_dot_prd'] = normed_group_dot_prd
         return ret_dict
 
 
