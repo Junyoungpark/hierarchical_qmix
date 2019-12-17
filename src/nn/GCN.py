@@ -10,10 +10,11 @@ class GCNConfig(ConfigBase):
         super(GCNConfig, self).__init__(name=name, gcn=gcn_conf)
         self.gcn = {
             'in_features': 51,
-            'hidden_features': 64,
+            'hidden_features': 128,
             'out_features': 1,
             'num_hidden_layers': 2,
-            'hidden_act': 'mish'
+            'hidden_act': 'mish',
+            'out_act': None
         }
 
 
@@ -24,7 +25,8 @@ class GCN(nn.Module):
                  hidden_features,
                  out_features,
                  num_hidden_layers,
-                 hidden_act):
+                 hidden_act,
+                 out_act):
         super(GCN, self).__init__()
 
         input_dims = [in_features] + num_hidden_layers * [hidden_features]
@@ -38,12 +40,17 @@ class GCN(nn.Module):
             self.layers.append(layer)
 
         self.act = get_nn_activation(hidden_act)
+        self.out_act = get_nn_activation(out_act)
 
     def forward(self, input, adj):
 
         normed_adj = self.layers[0].Laplacian_norm(adj)
         x = input
-        for layer in self.layers:
+        for layer in self.layers[:-1]:
             x = layer(input=x, adj=normed_adj, adj_normed=True)
             x = self.act(x)
+
+        x = self.layers[-1](input=x, adj=normed_adj, adj_normed=True)
+        x = self.out_act(x)
+
         return x

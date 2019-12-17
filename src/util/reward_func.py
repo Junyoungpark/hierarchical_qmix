@@ -15,8 +15,8 @@ def victory_if_zero_enemy(stat_dict,
             reward = 1.0 * victory_coeff
         else:
             reward = -1.0 * victory_coeff
-        reward += reward_bias
     else:
-        reward = 0
+        reward = 0.0
+    reward += reward_bias
 
     return reward
