@@ -5,7 +5,7 @@
 
 __pycache__/
 
-*/wandb
 # wandb
 test/wandb/
+wandb/
 
